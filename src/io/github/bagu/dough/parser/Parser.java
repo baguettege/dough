@@ -1,7 +1,6 @@
 package io.github.bagu.dough.parser;
 
 import io.github.bagu.dough.ast.*;
-import vm.ast.*;
 import io.github.bagu.dough.source.SourceRange;
 import io.github.bagu.dough.token.Token;
 import io.github.bagu.dough.token.TokenKind;
@@ -126,12 +125,6 @@ public final class Parser {
         boolean matches = check(expected);
         if (matches) advance();
         return matches;
-    }
-
-    private void skip(int count) {
-        for (int i = 0; i < count; i++) {
-            advance();
-        }
     }
 
     private Token expect(TokenKind kind, String message) {

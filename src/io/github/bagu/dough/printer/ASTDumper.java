@@ -1,7 +1,6 @@
 package io.github.bagu.dough.printer;
 
 import io.github.bagu.dough.ast.*;
-import vm.ast.*;
 
 import java.util.Objects;
 

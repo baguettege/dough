@@ -1,7 +1,6 @@
 package io.github.bagu.dough.semantic;
 
 import io.github.bagu.dough.ast.*;
-import vm.ast.*;
 import io.github.bagu.dough.source.SourceRange;
 import io.github.bagu.dough.type.DoughType;
 import io.github.bagu.dough.type.PrimitiveType;
