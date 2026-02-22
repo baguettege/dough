@@ -1,0 +1,41 @@
+types:
+    str
+    int
+    float
+    bool
+    (void)
+
+variables:
+    var x: int = 1;
+    mutable
+
+functions:
+    func sum(a: int, b: int): int {
+        return a + b;
+    }
+
+control flow:
+    if (cond) {}
+    if (cond) {} else {}
+
+    while (cond) {}
+
+    return (functions)
+
+operators:
+    + - * /
+    == !=
+    < >
+    <= >=
+    and or
+    not
+
+    = (assign)
+
+comments:
+    /* block comment */
+
+string escapes:
+    \\
+    \"
+    \n
