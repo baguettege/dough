@@ -3,7 +3,6 @@ package io.github.bagu.dough.semantic;
 import io.github.bagu.dough.ast.Expr;
 import io.github.bagu.dough.ast.Node;
 import io.github.bagu.dough.ast.Program;
-import vm.ast.*;
 import io.github.bagu.dough.type.DoughType;
 
 import java.util.Map;
