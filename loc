@@ -1,0 +1,904 @@
+#[derive(Debug)]
+pub(crate) enum Instr {
+    Nop {},
+    IAdd {
+        dst: u8,
+        a: u8,
+        b: u8,
+    },
+    ISub {
+        dst: u8,
+        a: u8,
+        b: u8,
+    },
+    IMul {
+        dst: u8,
+        a: u8,
+        b: u8,
+    },
+    IDiv {
+        dst: u8,
+        a: u8,
+        b: u8,
+    },
+    IEq {
+        dst: u8,
+        a: u8,
+        b: u8,
+    },
+    INe {
+        dst: u8,
+        a: u8,
+        b: u8,
+    },
+    ILt {
+        dst: u8,
+        a: u8,
+        b: u8,
+    },
+    ILe {
+        dst: u8,
+        a: u8,
+        b: u8,
+    },
+    IGt {
+        dst: u8,
+        a: u8,
+        b: u8,
+    },
+    IGe {
+        dst: u8,
+        a: u8,
+        b: u8,
+    },
+    INeg {
+        dst: u8,
+        src: u8,
+    },
+    FAdd {
+        dst: u8,
+        a: u8,
+        b: u8,
+    },
+    FSub {
+        dst: u8,
+        a: u8,
+        b: u8,
+    },
+    FMul {
+        dst: u8,
+        a: u8,
+        b: u8,
+    },
+    FDiv {
+        dst: u8,
+        a: u8,
+        b: u8,
+    },
+    FEq {
+        dst: u8,
+        a: u8,
+        b: u8,
+    },
+    FNe {
+        dst: u8,
+        a: u8,
+        b: u8,
+    },
+    FLt {
+        dst: u8,
+        a: u8,
+        b: u8,
+    },
+    FLe {
+        dst: u8,
+        a: u8,
+        b: u8,
+    },
+    FGt {
+        dst: u8,
+        a: u8,
+        b: u8,
+    },
+    FGe {
+        dst: u8,
+        a: u8,
+        b: u8,
+    },
+    FNeg {
+        dst: u8,
+        src: u8,
+    },
+    Not {
+        dst: u8,
+        src: u8,
+    },
+    SEq {
+        dst: u8,
+        a: u8,
+        b: u8,
+    },
+    SNe {
+        dst: u8,
+        a: u8,
+        b: u8,
+    },
+    Concat {
+        dst: u8,
+        a: u8,
+        b: u8,
+    },
+    I2F {
+        dst: u8,
+        src: u8,
+    },
+    F2I {
+        dst: u8,
+        src: u8,
+    },
+    Mov {
+        dst: u8,
+        src: u8,
+    },
+    LoadConst {
+        dst: u8,
+        idx: u16,
+    },
+    LoadUnit {
+        dst: u8,
+    },
+    GetGlobal {
+        dst: u8,
+        idx: u16,
+    },
+    SetGlobal {
+        idx: u16,
+        src: u8,
+    },
+    Jmp {
+        off: i16,
+    },
+    Jf {
+        src: u8,
+        off: i16,
+    },
+    Call {
+        idx: u16,
+        arg_start: u8,
+        ret: u8,
+    },
+    Ret {
+        src: u8,
+    },
+    NewArray {
+        dst: u8,
+        size: u32,
+    },
+    ArrayLen {
+        dst: u8,
+        src: u8,
+    },
+    GetIndex {
+        dst: u8,
+        idx: u32,
+        arr: u8,
+    },
+    SetIndex {
+        idx: u32,
+        src: u8,
+        arr: u8,
+    },
+}
+impl Instr {
+    fn decode(decoder: &mut Decoder) -> Self {
+        let op = decoder.next_u8();
+
+        match op {
+            0x00 => Instr::Nop {},
+            0x01 => Instr::IAdd {
+                dst: <u8 as Decode>::decode(decoder),
+                a: <u8 as Decode>::decode(decoder),
+                b: <u8 as Decode>::decode(decoder),
+            },
+            0x02 => Instr::ISub {
+                dst: <u8 as Decode>::decode(decoder),
+                a: <u8 as Decode>::decode(decoder),
+                b: <u8 as Decode>::decode(decoder),
+            },
+            0x03 => Instr::IMul {
+                dst: <u8 as Decode>::decode(decoder),
+                a: <u8 as Decode>::decode(decoder),
+                b: <u8 as Decode>::decode(decoder),
+            },
+            0x04 => Instr::IDiv {
+                dst: <u8 as Decode>::decode(decoder),
+                a: <u8 as Decode>::decode(decoder),
+                b: <u8 as Decode>::decode(decoder),
+            },
+            0x05 => Instr::IEq {
+                dst: <u8 as Decode>::decode(decoder),
+                a: <u8 as Decode>::decode(decoder),
+                b: <u8 as Decode>::decode(decoder),
+            },
+            0x06 => Instr::INe {
+                dst: <u8 as Decode>::decode(decoder),
+                a: <u8 as Decode>::decode(decoder),
+                b: <u8 as Decode>::decode(decoder),
+            },
+            0x07 => Instr::ILt {
+                dst: <u8 as Decode>::decode(decoder),
+                a: <u8 as Decode>::decode(decoder),
+                b: <u8 as Decode>::decode(decoder),
+            },
+            0x08 => Instr::ILe {
+                dst: <u8 as Decode>::decode(decoder),
+                a: <u8 as Decode>::decode(decoder),
+                b: <u8 as Decode>::decode(decoder),
+            },
+            0x09 => Instr::IGt {
+                dst: <u8 as Decode>::decode(decoder),
+                a: <u8 as Decode>::decode(decoder),
+                b: <u8 as Decode>::decode(decoder),
+            },
+            0x0A => Instr::IGe {
+                dst: <u8 as Decode>::decode(decoder),
+                a: <u8 as Decode>::decode(decoder),
+                b: <u8 as Decode>::decode(decoder),
+            },
+            0x11 => Instr::INeg {
+                dst: <u8 as Decode>::decode(decoder),
+                src: <u8 as Decode>::decode(decoder),
+            },
+            0x12 => Instr::FAdd {
+                dst: <u8 as Decode>::decode(decoder),
+                a: <u8 as Decode>::decode(decoder),
+                b: <u8 as Decode>::decode(decoder),
+            },
+            0x13 => Instr::FSub {
+                dst: <u8 as Decode>::decode(decoder),
+                a: <u8 as Decode>::decode(decoder),
+                b: <u8 as Decode>::decode(decoder),
+            },
+            0x14 => Instr::FMul {
+                dst: <u8 as Decode>::decode(decoder),
+                a: <u8 as Decode>::decode(decoder),
+                b: <u8 as Decode>::decode(decoder),
+            },
+            0x15 => Instr::FDiv {
+                dst: <u8 as Decode>::decode(decoder),
+                a: <u8 as Decode>::decode(decoder),
+                b: <u8 as Decode>::decode(decoder),
+            },
+            0x16 => Instr::FEq {
+                dst: <u8 as Decode>::decode(decoder),
+                a: <u8 as Decode>::decode(decoder),
+                b: <u8 as Decode>::decode(decoder),
+            },
+            0x17 => Instr::FNe {
+                dst: <u8 as Decode>::decode(decoder),
+                a: <u8 as Decode>::decode(decoder),
+                b: <u8 as Decode>::decode(decoder),
+            },
+            0x18 => Instr::FLt {
+                dst: <u8 as Decode>::decode(decoder),
+                a: <u8 as Decode>::decode(decoder),
+                b: <u8 as Decode>::decode(decoder),
+            },
+            0x19 => Instr::FLe {
+                dst: <u8 as Decode>::decode(decoder),
+                a: <u8 as Decode>::decode(decoder),
+                b: <u8 as Decode>::decode(decoder),
+            },
+            0x1A => Instr::FGt {
+                dst: <u8 as Decode>::decode(decoder),
+                a: <u8 as Decode>::decode(decoder),
+                b: <u8 as Decode>::decode(decoder),
+            },
+            0x1B => Instr::FGe {
+                dst: <u8 as Decode>::decode(decoder),
+                a: <u8 as Decode>::decode(decoder),
+                b: <u8 as Decode>::decode(decoder),
+            },
+            0x1C => Instr::FNeg {
+                dst: <u8 as Decode>::decode(decoder),
+                src: <u8 as Decode>::decode(decoder),
+            },
+            0x1D => Instr::Not {
+                dst: <u8 as Decode>::decode(decoder),
+                src: <u8 as Decode>::decode(decoder),
+            },
+            0x1E => Instr::SEq {
+                dst: <u8 as Decode>::decode(decoder),
+                a: <u8 as Decode>::decode(decoder),
+                b: <u8 as Decode>::decode(decoder),
+            },
+            0x1F => Instr::SNe {
+                dst: <u8 as Decode>::decode(decoder),
+                a: <u8 as Decode>::decode(decoder),
+                b: <u8 as Decode>::decode(decoder),
+            },
+            0x20 => Instr::Concat {
+                dst: <u8 as Decode>::decode(decoder),
+                a: <u8 as Decode>::decode(decoder),
+                b: <u8 as Decode>::decode(decoder),
+            },
+            0x21 => Instr::I2F {
+                dst: <u8 as Decode>::decode(decoder),
+                src: <u8 as Decode>::decode(decoder),
+            },
+            0x22 => Instr::F2I {
+                dst: <u8 as Decode>::decode(decoder),
+                src: <u8 as Decode>::decode(decoder),
+            },
+            0x23 => Instr::Mov {
+                dst: <u8 as Decode>::decode(decoder),
+                src: <u8 as Decode>::decode(decoder),
+            },
+            0x24 => Instr::LoadConst {
+                dst: <u8 as Decode>::decode(decoder),
+                idx: <u16 as Decode>::decode(decoder),
+            },
+            0x25 => Instr::LoadUnit {
+                dst: <u8 as Decode>::decode(decoder),
+            },
+            0x26 => Instr::GetGlobal {
+                dst: <u8 as Decode>::decode(decoder),
+                idx: <u16 as Decode>::decode(decoder),
+            },
+            0x27 => Instr::SetGlobal {
+                idx: <u16 as Decode>::decode(decoder),
+                src: <u8 as Decode>::decode(decoder),
+            },
+            0x28 => Instr::Jmp {
+                off: <i16 as Decode>::decode(decoder),
+            },
+            0x29 => Instr::Jf {
+                src: <u8 as Decode>::decode(decoder),
+                off: <i16 as Decode>::decode(decoder),
+            },
+            0x2A => Instr::Call {
+                idx: <u16 as Decode>::decode(decoder),
+                arg_start: <u8 as Decode>::decode(decoder),
+                ret: <u8 as Decode>::decode(decoder),
+            },
+            0x2B => Instr::Ret {
+                src: <u8 as Decode>::decode(decoder),
+            },
+            0x2C => Instr::NewArray {
+                dst: <u8 as Decode>::decode(decoder),
+                size: <u32 as Decode>::decode(decoder),
+            },
+            0x2D => Instr::ArrayLen {
+                dst: <u8 as Decode>::decode(decoder),
+                src: <u8 as Decode>::decode(decoder),
+            },
+            0x2E => Instr::GetIndex {
+                dst: <u8 as Decode>::decode(decoder),
+                idx: <u32 as Decode>::decode(decoder),
+                arr: <u8 as Decode>::decode(decoder),
+            },
+            0x2F => Instr::SetIndex {
+                idx: <u32 as Decode>::decode(decoder),
+                src: <u8 as Decode>::decode(decoder),
+                arr: <u8 as Decode>::decode(decoder),
+            },
+            _ => unreachable!("unknown opcode {}", op)
+        }
+    }
+
+    fn encode(&self, buf: &mut Vec<u8>) {
+        match self {
+            Instr::Nop {} => {
+                buf.push(0x00);
+            }
+            Instr::IAdd { dst, a, b, } => {
+                buf.push(0x01);
+                dst.encode(buf);
+                a.encode(buf);
+                b.encode(buf);
+            }
+            Instr::ISub { dst, a, b, } => {
+                buf.push(0x02);
+                dst.encode(buf);
+                a.encode(buf);
+                b.encode(buf);
+            }
+            Instr::IMul { dst, a, b, } => {
+                buf.push(0x03);
+                dst.encode(buf);
+                a.encode(buf);
+                b.encode(buf);
+            }
+            Instr::IDiv { dst, a, b, } => {
+                buf.push(0x04);
+                dst.encode(buf);
+                a.encode(buf);
+                b.encode(buf);
+            }
+            Instr::IEq { dst, a, b, } => {
+                buf.push(0x05);
+                dst.encode(buf);
+                a.encode(buf);
+                b.encode(buf);
+            }
+            Instr::INe { dst, a, b, } => {
+                buf.push(0x06);
+                dst.encode(buf);
+                a.encode(buf);
+                b.encode(buf);
+            }
+            Instr::ILt { dst, a, b, } => {
+                buf.push(0x07);
+                dst.encode(buf);
+                a.encode(buf);
+                b.encode(buf);
+            }
+            Instr::ILe { dst, a, b, } => {
+                buf.push(0x08);
+                dst.encode(buf);
+                a.encode(buf);
+                b.encode(buf);
+            }
+            Instr::IGt { dst, a, b, } => {
+                buf.push(0x09);
+                dst.encode(buf);
+                a.encode(buf);
+                b.encode(buf);
+            }
+            Instr::IGe { dst, a, b, } => {
+                buf.push(0x0A);
+                dst.encode(buf);
+                a.encode(buf);
+                b.encode(buf);
+            }
+            Instr::INeg { dst, src, } => {
+                buf.push(0x11);
+                dst.encode(buf);
+                src.encode(buf);
+            }
+            Instr::FAdd { dst, a, b, } => {
+                buf.push(0x12);
+                dst.encode(buf);
+                a.encode(buf);
+                b.encode(buf);
+            }
+            Instr::FSub { dst, a, b, } => {
+                buf.push(0x13);
+                dst.encode(buf);
+                a.encode(buf);
+                b.encode(buf);
+            }
+            Instr::FMul { dst, a, b, } => {
+                buf.push(0x14);
+                dst.encode(buf);
+                a.encode(buf);
+                b.encode(buf);
+            }
+            Instr::FDiv { dst, a, b, } => {
+                buf.push(0x15);
+                dst.encode(buf);
+                a.encode(buf);
+                b.encode(buf);
+            }
+            Instr::FEq { dst, a, b, } => {
+                buf.push(0x16);
+                dst.encode(buf);
+                a.encode(buf);
+                b.encode(buf);
+            }
+            Instr::FNe { dst, a, b, } => {
+                buf.push(0x17);
+                dst.encode(buf);
+                a.encode(buf);
+                b.encode(buf);
+            }
+            Instr::FLt { dst, a, b, } => {
+                buf.push(0x18);
+                dst.encode(buf);
+                a.encode(buf);
+                b.encode(buf);
+            }
+            Instr::FLe { dst, a, b, } => {
+                buf.push(0x19);
+                dst.encode(buf);
+                a.encode(buf);
+                b.encode(buf);
+            }
+            Instr::FGt { dst, a, b, } => {
+                buf.push(0x1A);
+                dst.encode(buf);
+                a.encode(buf);
+                b.encode(buf);
+            }
+            Instr::FGe { dst, a, b, } => {
+                buf.push(0x1B);
+                dst.encode(buf);
+                a.encode(buf);
+                b.encode(buf);
+            }
+            Instr::FNeg { dst, src, } => {
+                buf.push(0x1C);
+                dst.encode(buf);
+                src.encode(buf);
+            }
+            Instr::Not { dst, src, } => {
+                buf.push(0x1D);
+                dst.encode(buf);
+                src.encode(buf);
+            }
+            Instr::SEq { dst, a, b, } => {
+                buf.push(0x1E);
+                dst.encode(buf);
+                a.encode(buf);
+                b.encode(buf);
+            }
+            Instr::SNe { dst, a, b, } => {
+                buf.push(0x1F);
+                dst.encode(buf);
+                a.encode(buf);
+                b.encode(buf);
+            }
+            Instr::Concat { dst, a, b, } => {
+                buf.push(0x20);
+                dst.encode(buf);
+                a.encode(buf);
+                b.encode(buf);
+            }
+            Instr::I2F { dst, src, } => {
+                buf.push(0x21);
+                dst.encode(buf);
+                src.encode(buf);
+            }
+            Instr::F2I { dst, src, } => {
+                buf.push(0x22);
+                dst.encode(buf);
+                src.encode(buf);
+            }
+            Instr::Mov { dst, src, } => {
+                buf.push(0x23);
+                dst.encode(buf);
+                src.encode(buf);
+            }
+            Instr::LoadConst { dst, idx, } => {
+                buf.push(0x24);
+                dst.encode(buf);
+                idx.encode(buf);
+            }
+            Instr::LoadUnit { dst, } => {
+                buf.push(0x25);
+                dst.encode(buf);
+            }
+            Instr::GetGlobal { dst, idx, } => {
+                buf.push(0x26);
+                dst.encode(buf);
+                idx.encode(buf);
+            }
+            Instr::SetGlobal { idx, src, } => {
+                buf.push(0x27);
+                idx.encode(buf);
+                src.encode(buf);
+            }
+            Instr::Jmp { off, } => {
+                buf.push(0x28);
+                off.encode(buf);
+            }
+            Instr::Jf { src, off, } => {
+                buf.push(0x29);
+                src.encode(buf);
+                off.encode(buf);
+            }
+            Instr::Call { idx, arg_start, ret, } => {
+                buf.push(0x2A);
+                idx.encode(buf);
+                arg_start.encode(buf);
+                ret.encode(buf);
+            }
+            Instr::Ret { src, } => {
+                buf.push(0x2B);
+                src.encode(buf);
+            }
+            Instr::NewArray { dst, size, } => {
+                buf.push(0x2C);
+                dst.encode(buf);
+                size.encode(buf);
+            }
+            Instr::ArrayLen { dst, src, } => {
+                buf.push(0x2D);
+                dst.encode(buf);
+                src.encode(buf);
+            }
+            Instr::GetIndex { dst, idx, arr, } => {
+                buf.push(0x2E);
+                dst.encode(buf);
+                idx.encode(buf);
+                arr.encode(buf);
+            }
+            Instr::SetIndex { idx, src, arr, } => {
+                buf.push(0x2F);
+                idx.encode(buf);
+                src.encode(buf);
+                arr.encode(buf);
+            }
+        }
+    }
+}
+impl Display for Instr {
+    fn fmt(&self, f: &mut Formatter<'_>) -> fmt::Result {
+        match self {
+            Instr::Nop {} => {
+                f.write_fmt(::core::format_args!(stringify!( Nop )))?;
+
+                Ok(())
+            }
+            Instr::IAdd { dst, a, b, } => {
+                f.write_fmt(::core::format_args!(stringify!( IAdd )))?;
+                f.write_fmt(::core::format_args!(" {}:{}", stringify!( dst ), dst))?;
+                f.write_fmt(::core::format_args!(" {}:{}", stringify!( a ), a))?;
+                f.write_fmt(::core::format_args!(" {}:{}", stringify!( b ), b))?;
+                Ok(())
+            }
+            Instr::ISub { dst, a, b, } => {
+                f.write_fmt(::core::format_args!(stringify!( ISub )))?;
+                f.write_fmt(::core::format_args!(" {}:{}", stringify!( dst ), dst))?;
+                f.write_fmt(::core::format_args!(" {}:{}", stringify!( a ), a))?;
+                f.write_fmt(::core::format_args!(" {}:{}", stringify!( b ), b))?;
+                Ok(())
+            }
+            Instr::IMul { dst, a, b, } => {
+                f.write_fmt(::core::format_args!(stringify!( IMul )))?;
+                f.write_fmt(::core::format_args!(" {}:{}", stringify!( dst ), dst))?;
+                f.write_fmt(::core::format_args!(" {}:{}", stringify!( a ), a))?;
+                f.write_fmt(::core::format_args!(" {}:{}", stringify!( b ), b))?;
+                Ok(())
+            }
+            Instr::IDiv { dst, a, b, } => {
+                f.write_fmt(::core::format_args!(stringify!( IDiv )))?;
+                f.write_fmt(::core::format_args!(" {}:{}", stringify!( dst ), dst))?;
+                f.write_fmt(::core::format_args!(" {}:{}", stringify!( a ), a))?;
+                f.write_fmt(::core::format_args!(" {}:{}", stringify!( b ), b))?;
+                Ok(())
+            }
+            Instr::IEq { dst, a, b, } => {
+                f.write_fmt(::core::format_args!(stringify!( IEq )))?;
+                f.write_fmt(::core::format_args!(" {}:{}", stringify!( dst ), dst))?;
+                f.write_fmt(::core::format_args!(" {}:{}", stringify!( a ), a))?;
+                f.write_fmt(::core::format_args!(" {}:{}", stringify!( b ), b))?;
+                Ok(())
+            }
+            Instr::INe { dst, a, b, } => {
+                f.write_fmt(::core::format_args!(stringify!( INe )))?;
+                f.write_fmt(::core::format_args!(" {}:{}", stringify!( dst ), dst))?;
+                f.write_fmt(::core::format_args!(" {}:{}", stringify!( a ), a))?;
+                f.write_fmt(::core::format_args!(" {}:{}", stringify!( b ), b))?;
+                Ok(())
+            }
+            Instr::ILt { dst, a, b, } => {
+                f.write_fmt(::core::format_args!(stringify!( ILt )))?;
+                f.write_fmt(::core::format_args!(" {}:{}", stringify!( dst ), dst))?;
+                f.write_fmt(::core::format_args!(" {}:{}", stringify!( a ), a))?;
+                f.write_fmt(::core::format_args!(" {}:{}", stringify!( b ), b))?;
+                Ok(())
+            }
+            Instr::ILe { dst, a, b, } => {
+                f.write_fmt(::core::format_args!(stringify!( ILe )))?;
+                f.write_fmt(::core::format_args!(" {}:{}", stringify!( dst ), dst))?;
+                f.write_fmt(::core::format_args!(" {}:{}", stringify!( a ), a))?;
+                f.write_fmt(::core::format_args!(" {}:{}", stringify!( b ), b))?;
+                Ok(())
+            }
+            Instr::IGt { dst, a, b, } => {
+                f.write_fmt(::core::format_args!(stringify!( IGt )))?;
+                f.write_fmt(::core::format_args!(" {}:{}", stringify!( dst ), dst))?;
+                f.write_fmt(::core::format_args!(" {}:{}", stringify!( a ), a))?;
+                f.write_fmt(::core::format_args!(" {}:{}", stringify!( b ), b))?;
+                Ok(())
+            }
+            Instr::IGe { dst, a, b, } => {
+                f.write_fmt(::core::format_args!(stringify!( IGe )))?;
+                f.write_fmt(::core::format_args!(" {}:{}", stringify!( dst ), dst))?;
+                f.write_fmt(::core::format_args!(" {}:{}", stringify!( a ), a))?;
+                f.write_fmt(::core::format_args!(" {}:{}", stringify!( b ), b))?;
+                Ok(())
+            }
+            Instr::INeg { dst, src, } => {
+                f.write_fmt(::core::format_args!(stringify!( INeg )))?;
+                f.write_fmt(::core::format_args!(" {}:{}", stringify!( dst ), dst))?;
+                f.write_fmt(::core::format_args!(" {}:{}", stringify!( src ), src))?;
+                Ok(())
+            }
+            Instr::FAdd { dst, a, b, } => {
+                f.write_fmt(::core::format_args!(stringify!( FAdd )))?;
+                f.write_fmt(::core::format_args!(" {}:{}", stringify!( dst ), dst))?;
+                f.write_fmt(::core::format_args!(" {}:{}", stringify!( a ), a))?;
+                f.write_fmt(::core::format_args!(" {}:{}", stringify!( b ), b))?;
+                Ok(())
+            }
+            Instr::FSub { dst, a, b, } => {
+                f.write_fmt(::core::format_args!(stringify!( FSub )))?;
+                f.write_fmt(::core::format_args!(" {}:{}", stringify!( dst ), dst))?;
+                f.write_fmt(::core::format_args!(" {}:{}", stringify!( a ), a))?;
+                f.write_fmt(::core::format_args!(" {}:{}", stringify!( b ), b))?;
+                Ok(())
+            }
+            Instr::FMul { dst, a, b, } => {
+                f.write_fmt(::core::format_args!(stringify!( FMul )))?;
+                f.write_fmt(::core::format_args!(" {}:{}", stringify!( dst ), dst))?;
+                f.write_fmt(::core::format_args!(" {}:{}", stringify!( a ), a))?;
+                f.write_fmt(::core::format_args!(" {}:{}", stringify!( b ), b))?;
+                Ok(())
+            }
+            Instr::FDiv { dst, a, b, } => {
+                f.write_fmt(::core::format_args!(stringify!( FDiv )))?;
+                f.write_fmt(::core::format_args!(" {}:{}", stringify!( dst ), dst))?;
+                f.write_fmt(::core::format_args!(" {}:{}", stringify!( a ), a))?;
+                f.write_fmt(::core::format_args!(" {}:{}", stringify!( b ), b))?;
+                Ok(())
+            }
+            Instr::FEq { dst, a, b, } => {
+                f.write_fmt(::core::format_args!(stringify!( FEq )))?;
+                f.write_fmt(::core::format_args!(" {}:{}", stringify!( dst ), dst))?;
+                f.write_fmt(::core::format_args!(" {}:{}", stringify!( a ), a))?;
+                f.write_fmt(::core::format_args!(" {}:{}", stringify!( b ), b))?;
+                Ok(())
+            }
+            Instr::FNe { dst, a, b, } => {
+                f.write_fmt(::core::format_args!(stringify!( FNe )))?;
+                f.write_fmt(::core::format_args!(" {}:{}", stringify!( dst ), dst))?;
+                f.write_fmt(::core::format_args!(" {}:{}", stringify!( a ), a))?;
+                f.write_fmt(::core::format_args!(" {}:{}", stringify!( b ), b))?;
+                Ok(())
+            }
+            Instr::FLt { dst, a, b, } => {
+                f.write_fmt(::core::format_args!(stringify!( FLt )))?;
+                f.write_fmt(::core::format_args!(" {}:{}", stringify!( dst ), dst))?;
+                f.write_fmt(::core::format_args!(" {}:{}", stringify!( a ), a))?;
+                f.write_fmt(::core::format_args!(" {}:{}", stringify!( b ), b))?;
+                Ok(())
+            }
+            Instr::FLe { dst, a, b, } => {
+                f.write_fmt(::core::format_args!(stringify!( FLe )))?;
+                f.write_fmt(::core::format_args!(" {}:{}", stringify!( dst ), dst))?;
+                f.write_fmt(::core::format_args!(" {}:{}", stringify!( a ), a))?;
+                f.write_fmt(::core::format_args!(" {}:{}", stringify!( b ), b))?;
+                Ok(())
+            }
+            Instr::FGt { dst, a, b, } => {
+                f.write_fmt(::core::format_args!(stringify!( FGt )))?;
+                f.write_fmt(::core::format_args!(" {}:{}", stringify!( dst ), dst))?;
+                f.write_fmt(::core::format_args!(" {}:{}", stringify!( a ), a))?;
+                f.write_fmt(::core::format_args!(" {}:{}", stringify!( b ), b))?;
+                Ok(())
+            }
+            Instr::FGe { dst, a, b, } => {
+                f.write_fmt(::core::format_args!(stringify!( FGe )))?;
+                f.write_fmt(::core::format_args!(" {}:{}", stringify!( dst ), dst))?;
+                f.write_fmt(::core::format_args!(" {}:{}", stringify!( a ), a))?;
+                f.write_fmt(::core::format_args!(" {}:{}", stringify!( b ), b))?;
+                Ok(())
+            }
+            Instr::FNeg { dst, src, } => {
+                f.write_fmt(::core::format_args!(stringify!( FNeg )))?;
+                f.write_fmt(::core::format_args!(" {}:{}", stringify!( dst ), dst))?;
+                f.write_fmt(::core::format_args!(" {}:{}", stringify!( src ), src))?;
+                Ok(())
+            }
+            Instr::Not { dst, src, } => {
+                f.write_fmt(::core::format_args!(stringify!( Not )))?;
+                f.write_fmt(::core::format_args!(" {}:{}", stringify!( dst ), dst))?;
+                f.write_fmt(::core::format_args!(" {}:{}", stringify!( src ), src))?;
+                Ok(())
+            }
+            Instr::SEq { dst, a, b, } => {
+                f.write_fmt(::core::format_args!(stringify!( SEq )))?;
+                f.write_fmt(::core::format_args!(" {}:{}", stringify!( dst ), dst))?;
+                f.write_fmt(::core::format_args!(" {}:{}", stringify!( a ), a))?;
+                f.write_fmt(::core::format_args!(" {}:{}", stringify!( b ), b))?;
+                Ok(())
+            }
+            Instr::SNe { dst, a, b, } => {
+                f.write_fmt(::core::format_args!(stringify!( SNe )))?;
+                f.write_fmt(::core::format_args!(" {}:{}", stringify!( dst ), dst))?;
+                f.write_fmt(::core::format_args!(" {}:{}", stringify!( a ), a))?;
+                f.write_fmt(::core::format_args!(" {}:{}", stringify!( b ), b))?;
+                Ok(())
+            }
+            Instr::Concat { dst, a, b, } => {
+                f.write_fmt(::core::format_args!(stringify!( Concat )))?;
+                f.write_fmt(::core::format_args!(" {}:{}", stringify!( dst ), dst))?;
+                f.write_fmt(::core::format_args!(" {}:{}", stringify!( a ), a))?;
+                f.write_fmt(::core::format_args!(" {}:{}", stringify!( b ), b))?;
+                Ok(())
+            }
+            Instr::I2F { dst, src, } => {
+                f.write_fmt(::core::format_args!(stringify!( I2F )))?;
+                f.write_fmt(::core::format_args!(" {}:{}", stringify!( dst ), dst))?;
+                f.write_fmt(::core::format_args!(" {}:{}", stringify!( src ), src))?;
+                Ok(())
+            }
+            Instr::F2I { dst, src, } => {
+                f.write_fmt(::core::format_args!(stringify!( F2I )))?;
+                f.write_fmt(::core::format_args!(" {}:{}", stringify!( dst ), dst))?;
+                f.write_fmt(::core::format_args!(" {}:{}", stringify!( src ), src))?;
+                Ok(())
+            }
+            Instr::Mov { dst, src, } => {
+                f.write_fmt(::core::format_args!(stringify!( Mov )))?;
+                f.write_fmt(::core::format_args!(" {}:{}", stringify!( dst ), dst))?;
+                f.write_fmt(::core::format_args!(" {}:{}", stringify!( src ), src))?;
+                Ok(())
+            }
+            Instr::LoadConst { dst, idx, } => {
+                f.write_fmt(::core::format_args!(stringify!( LoadConst )))?;
+                f.write_fmt(::core::format_args!(" {}:{}", stringify!( dst ), dst))?;
+                f.write_fmt(::core::format_args!(" {}:{}", stringify!( idx ), idx))?;
+                Ok(())
+            }
+            Instr::LoadUnit { dst, } => {
+                f.write_fmt(::core::format_args!(stringify!( LoadUnit )))?;
+                f.write_fmt(::core::format_args!(" {}:{}", stringify!( dst ), dst))?;
+                Ok(())
+            }
+            Instr::GetGlobal { dst, idx, } => {
+                f.write_fmt(::core::format_args!(stringify!( GetGlobal )))?;
+                f.write_fmt(::core::format_args!(" {}:{}", stringify!( dst ), dst))?;
+                f.write_fmt(::core::format_args!(" {}:{}", stringify!( idx ), idx))?;
+                Ok(())
+            }
+            Instr::SetGlobal { idx, src, } => {
+                f.write_fmt(::core::format_args!(stringify!( SetGlobal )))?;
+                f.write_fmt(::core::format_args!(" {}:{}", stringify!( idx ), idx))?;
+                f.write_fmt(::core::format_args!(" {}:{}", stringify!( src ), src))?;
+                Ok(())
+            }
+            Instr::Jmp { off, } => {
+                f.write_fmt(::core::format_args!(stringify!( Jmp )))?;
+                f.write_fmt(::core::format_args!(" {}:{}", stringify!( off ), off))?;
+                Ok(())
+            }
+            Instr::Jf { src, off, } => {
+                f.write_fmt(::core::format_args!(stringify!( Jf )))?;
+                f.write_fmt(::core::format_args!(" {}:{}", stringify!( src ), src))?;
+                f.write_fmt(::core::format_args!(" {}:{}", stringify!( off ), off))?;
+                Ok(())
+            }
+            Instr::Call { idx, arg_start, ret, } => {
+                f.write_fmt(::core::format_args!(stringify!( Call )))?;
+                f.write_fmt(::core::format_args!(" {}:{}", stringify!( idx ), idx))?;
+                f.write_fmt(::core::format_args!(" {}:{}", stringify!( arg_start ), arg_start))?;
+                f.write_fmt(::core::format_args!(" {}:{}", stringify!( ret ), ret))?;
+                Ok(())
+            }
+            Instr::Ret { src, } => {
+                f.write_fmt(::core::format_args!(stringify!( Ret )))?;
+                f.write_fmt(::core::format_args!(" {}:{}", stringify!( src ), src))?;
+                Ok(())
+            }
+            Instr::NewArray { dst, size, } => {
+                f.write_fmt(::core::format_args!(stringify!( NewArray )))?;
+                f.write_fmt(::core::format_args!(" {}:{}", stringify!( dst ), dst))?;
+                f.write_fmt(::core::format_args!(" {}:{}", stringify!( size ), size))?;
+                Ok(())
+            }
+            Instr::ArrayLen { dst, src, } => {
+                f.write_fmt(::core::format_args!(stringify!( ArrayLen )))?;
+                f.write_fmt(::core::format_args!(" {}:{}", stringify!( dst ), dst))?;
+                f.write_fmt(::core::format_args!(" {}:{}", stringify!( src ), src))?;
+                Ok(())
+            }
+            Instr::GetIndex { dst, idx, arr, } => {
+                f.write_fmt(::core::format_args!(stringify!( GetIndex )))?;
+                f.write_fmt(::core::format_args!(" {}:{}", stringify!( dst ), dst))?;
+                f.write_fmt(::core::format_args!(" {}:{}", stringify!( idx ), idx))?;
+                f.write_fmt(::core::format_args!(" {}:{}", stringify!( arr ), arr))?;
+                Ok(())
+            }
+            Instr::SetIndex { idx, src, arr, } => {
+                f.write_fmt(::core::format_args!(stringify!( SetIndex )))?;
+                f.write_fmt(::core::format_args!(" {}:{}", stringify!( idx ), idx))?;
+                f.write_fmt(::core::format_args!(" {}:{}", stringify!( src ), src))?;
+                f.write_fmt(::core::format_args!(" {}:{}", stringify!( arr ), arr))?;
+                Ok(())
+            }
+        }
+    }
+}
