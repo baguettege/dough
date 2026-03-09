@@ -22,7 +22,7 @@ impl SourceRange {
 
 impl Display for SourceRange {
     fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
-        write!(f, "[{}, {}]", self.start, self.end)
+        write!(f, "{}..{}", self.start, self.end)
     }
 }
 

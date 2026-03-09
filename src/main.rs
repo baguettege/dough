@@ -48,7 +48,11 @@ while x < 20 {
     ";
 
     match Lexer::lex(s) {
-        Ok(tokens) => println!("{:?}", tokens),
+        Ok(tokens) => {
+            let vec: Vec<String> =
+            tokens.iter().map(|t| t.to_string()).collect();
+            vec.iter().for_each(|s| println!("{}", s))
+        },
         Err(e) => eprintln!("{:?}", e)
     }
 

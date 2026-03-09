@@ -22,6 +22,12 @@ impl Token {
     }
 }
 
+impl Display for Token {
+    fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
+        write!(f, "{} @ {}", self.kind, self.span)
+    }
+}
+
 macro_rules! keywords {
     ( $( $kw:literal => $variant:ident ),* $(,)? ) => {
         pub(crate) fn from_keyword(s: &str) -> Option<TokenKind> {
