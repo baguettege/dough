@@ -30,6 +30,7 @@ fn main() {
 var x: int = 10;
 var y: float = 3.14;
 var flag: bool = true;
+var s: str = \"hello\" + \"world\";
 
 func add(a: int, b: int): int {
     var result: int = a + b;
