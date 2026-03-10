@@ -26,12 +26,12 @@ impl Frame {
         }
     }
 
-    pub(super) fn get_reg(&self, index: usize) -> DoughValue {
-        self.registers.get(index)
+    pub(super) fn get_reg(&self, index: u8) -> DoughValue {
+        self.registers.get(index as usize)
     }
 
-    pub(super) fn set_reg(&mut self, index: usize, value: DoughValue) {
-        self.registers.set(index, value);
+    pub(super) fn set_reg(&mut self, index: u8, value: DoughValue) {
+        self.registers.set(index as usize, value);
     }
 
     pub(super) fn has_next(&self) -> bool {

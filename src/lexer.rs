@@ -110,6 +110,7 @@ impl Lexer {
         let s = self.cursor.advance_while(
             |c| c.is_ascii_digit() || c == '.');
 
+        // allow only one dot
         let dot_count = s.chars().filter(|c| *c == '.').count();
 
         let kind = match dot_count {
