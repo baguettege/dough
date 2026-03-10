@@ -1,4 +1,4 @@
-use crate::source::SourceRange;
+use crate::span::Span;
 
 #[derive(Debug)]
 pub enum DoughError {
@@ -31,7 +31,7 @@ pub enum ParseError {
 
 #[derive(Debug)]
 pub enum LexError {
-    UnexpectedChar(char, SourceRange),
-    UnterminatedString(SourceRange),
-    InvalidNumber(String, SourceRange)
+    UnexpectedChar(char, Span),
+    UnterminatedString(Span),
+    InvalidNumber(String, Span)
 }

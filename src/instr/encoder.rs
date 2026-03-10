@@ -3,7 +3,7 @@ pub(super) trait Encode {
 }
 
 macro_rules! impl_encode {
-    ( $( $ty:ty ),* $(,)? ) => {
+    ($( $ty:ty ),* $(,)?) => {
         $(
             impl Encode for $ty {
                 fn encode(self, buf: &mut Vec<u8>) {

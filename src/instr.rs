@@ -1,28 +1,38 @@
 pub(crate) mod disassembler;
 pub(crate) mod assembler;
 mod encoder;
-mod decoder;
+pub(crate) mod decoder;
 
 use crate::instr::decoder::{Decoder, Decode};
 use crate::instr::encoder::Encode;
-use std::fmt;
 use std::fmt::{Display, Formatter};
 
-macro_rules! define_instrs {
-    (
-        $(
-            $mnemonic:ident ( $opcode:literal ) {
-                $( $operand:ident: $ty:ty ),* $(,)?
-            }
-        )+
-    ) => {
+macro_rules! instrs {
+    ($(
+        $mnemonic:ident ($opcode:literal) {
+            $( $operand:ident: $ty:ty ),* $(,)?
+        }
+    )*) => {
         #[derive(Debug)]
         pub(crate) enum Instr {
-            $(
-                $mnemonic {
-                    $( $operand: $ty, )*
-                },
-            )*
+            $( $mnemonic {
+                $( $operand: $ty, )*
+            }, )*
+        }
+
+        impl Display for Instr {
+            fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
+                match self {
+                    $(
+                        Self::$mnemonic {$( $operand, )*} => {
+                            write!(f, stringify!($mnemonic))?;
+                            $( write!(f, " {}:{}", stringify!($operand), $operand)?; )*
+                        }
+                    )*
+                }
+
+                Ok(())
+            }
         }
 
         impl Instr {
@@ -31,7 +41,7 @@ macro_rules! define_instrs {
 
                 match op {
                     $(
-                        $opcode => Instr::$mnemonic {
+                        $opcode => Self::$mnemonic {
                             $( $operand: <$ty as Decode>::decode(decoder), )*
                         },
                     )*
@@ -42,7 +52,7 @@ macro_rules! define_instrs {
             fn encode(&self, buf: &mut Vec<u8>) {
                 match self {
                     $(
-                        Instr::$mnemonic { $( $operand, )* } => {
+                        Self::$mnemonic {$( $operand, )*} => {
                             buf.push($opcode);
                             $( $operand.encode(buf); )*
                         }
@@ -50,26 +60,10 @@ macro_rules! define_instrs {
                 }
             }
         }
-
-        impl Display for Instr {
-            fn fmt(&self, f: &mut Formatter<'_>) -> fmt::Result {
-                match self {
-                    $(
-                        Instr::$mnemonic { $( $operand, )* } => {
-                            write!(f, stringify!($mnemonic))?;
-                            $(
-                                write!(f, " {}:{}", stringify!($operand), $operand)?;
-                            )*
-                            Ok(())
-                        }
-                    )*
-                }
-            }
-        }
     };
 }
 
-define_instrs! {
+instrs! {
     Nop(0x00) {}
 
    // int

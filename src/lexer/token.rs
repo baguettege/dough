@@ -1,15 +1,15 @@
 use std::fmt::{Display, Formatter};
 use crate::lexer::cursor::Cursor;
-use crate::source::SourceRange;
+use crate::span::Span;
 
 #[derive(Debug)]
 pub(crate) struct Token {
     kind: TokenKind,
-    span: SourceRange
+    span: Span
 }
 
 impl Token {
-    pub(crate) fn new(kind: TokenKind, span: SourceRange) -> Self {
+    pub(crate) fn new(kind: TokenKind, span: Span) -> Self {
         Self { kind, span }
     }
 
@@ -17,7 +17,7 @@ impl Token {
         &self.kind
     }
 
-    pub(crate) fn span(&self) -> SourceRange {
+    pub(crate) fn span(&self) -> Span {
         self.span
     }
 }

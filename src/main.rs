@@ -6,11 +6,12 @@ mod heap;
 mod value;
 mod error;
 mod bytecode;
-mod source;
-mod ast;
+mod span;
 mod compiler;
 mod instr;
 mod lexer;
+mod ast;
+mod vm;
 
 fn main() {
     let code = assemble! {
@@ -21,7 +22,7 @@ fn main() {
 
     println!("{:?}", code);
 
-    let disassembled = disassemble(&code);
+    let disassembled = disassemble(code);
     disassembled.iter().for_each(|instr| println!("{}", instr));
 
     println!("-----------------------------");

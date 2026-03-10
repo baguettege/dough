@@ -1,12 +1,13 @@
+use std::rc::Rc;
 use crate::instr::Instr;
 
-pub(crate) struct Decoder<'a> {
-    code: &'a [u8],
+pub(crate) struct Decoder {
+    code: Rc<Vec<u8>>,
     offset: usize
 }
 
-impl<'a> Decoder<'a> {
-    pub(crate) fn new(code: &'a [u8]) -> Self {
+impl Decoder {
+    pub(crate) fn new(code: Rc<Vec<u8>>) -> Self {
         Self { code, offset: 0 }
     }
 
@@ -52,7 +53,7 @@ pub(super) trait Decode {
 }
 
 macro_rules! impl_decode {
-    ( $( $ty:ty => $method:ident ),* $(,)? ) => {
+    ($( $ty:ty => $method:ident ),* $(,)?) => {
         $(
             impl Decode for $ty {
                 fn decode(decoder: &mut Decoder) -> Self {

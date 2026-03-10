@@ -1,10 +1,11 @@
 use crate::error::LexError;
 use crate::lexer::cursor::Cursor;
 use crate::lexer::token::{Token, TokenKind};
-use crate::source::SourceRange;
+use crate::span::Span;
 
 pub(crate) mod token;
 mod cursor;
+mod token2;
 
 pub(crate) type LexResult<T> = Result<T, LexError>;
 
@@ -22,8 +23,8 @@ impl Lexer {
         Self { cursor: Cursor::new(source), start: 0 }
     }
 
-    fn new_span(&self) -> SourceRange {
-        SourceRange::new(self.start, self.cursor.pos())
+    fn new_span(&self) -> Span {
+        Span::new(self.start, self.cursor.pos())
     }
 
     fn new_token(&self, kind: TokenKind) -> Token {
@@ -74,7 +75,8 @@ impl Lexer {
     }
 
     fn scan_string(&mut self) -> LexResult<Token> {
-        assert_eq!(self.cursor.peek(), '"');
+        assert!(self.cursor.check('"'));
+        self.cursor.skip(1);
 
         let s = self.cursor.advance_while(|c| c != '"');
 
@@ -86,10 +88,8 @@ impl Lexer {
     }
 
     fn scan_ident(&mut self) -> Token {
-        assert!({
-            let c = self.cursor.peek();
-            c.is_ascii_alphabetic() || c == '_'
-        });
+        assert!(self.cursor.check_if(
+            |c| c.is_ascii_alphabetic() || c == '_'));
 
         let s = self.cursor.advance_while(
             |c| c.is_ascii_alphanumeric() || c == '_');
@@ -105,7 +105,7 @@ impl Lexer {
     }
 
     fn scan_number(&mut self) -> LexResult<Token> {
-        assert!(self.cursor.peek().is_ascii_digit());
+        assert!(self.cursor.check_if(|c| c.is_ascii_digit()));
 
         let s = self.cursor.advance_while(
             |c| c.is_ascii_digit() || c == '.');

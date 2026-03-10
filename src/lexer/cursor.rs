@@ -43,7 +43,7 @@ impl Cursor {
     }
 
     pub(super) fn skip(&mut self, count: usize) {
-        for i in 0..count {
+        for _ in 0..count {
             self.advance();
         }
     }
