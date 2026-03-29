@@ -5,6 +5,7 @@ mod heap;
 mod value;
 mod lexer;
 mod span;
+mod ast;
 
 fn main() {
     let code = bytecode! {

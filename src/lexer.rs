@@ -3,7 +3,6 @@ use crate::span::Span;
 
 mod token;
 
-#[derive(Debug)]
 pub(crate) enum Error {
     UnexpectedChar(char, Span),
     UnterminatedString(Span),
