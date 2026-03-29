@@ -1,62 +1,23 @@
-use instr::Instr;
-use crate::instr::disassembler::disassemble;
-use crate::lexer::{Lexer};
+use crate::bytecode::{bytecode, Decoder, Instr};
 
+mod bytecode;
 mod heap;
 mod value;
-mod error;
-mod bytecode;
-mod span;
-mod compiler;
-mod instr;
 mod lexer;
-mod ast;
-mod vm;
+mod span;
 
 fn main() {
-    let code = assemble! {
-        Instr::Nop {},
-        Instr::IAdd { dst: 1, a: 2, b: 3 }
-        Instr::Call { idx: 128, arg_start: 56, ret: 255 }
+    let code = bytecode! {
+        IAdd dst:0 lhs:1 rhs:2;
+        IAdd dst:3 lhs:1 rhs:2;
+        Nop;
     };
 
-    println!("{:?}", code);
-
-    let disassembled = disassemble(code);
-    disassembled.iter().for_each(|instr| println!("{}", instr));
-
-    println!("-----------------------------");
-
-    let s = "
-var x: int = 10;
-var y: float = 3.14;
-var flag: bool = true;
-var s: str = \"hello\" + \"world\";
-
-func add(a: int, b: int): int {
-    var result: int = a + b;
-    return result;
-}
-
-if x >= 10 and flag {
-    y = y + 1.5;
-} else {
-    y = y - 2.0;
-}
-
-while x < 20 {
-    x = x + 1;
-}
-    ";
-
-    match Lexer::lex(s) {
-        Ok(tokens) => {
-            let vec: Vec<String> =
-            tokens.iter().map(|t| t.to_string()).collect();
-            vec.iter().for_each(|s| println!("{}", s))
-        },
-        Err(e) => eprintln!("{:?}", e)
-    }
-
-    println!("-----------------------------");
+    let mut decoder = Decoder::new(&code);
+    println!(
+        "{}\n{}\n{}",
+        decoder.decode::<Instr>().unwrap(),
+        decoder.decode::<Instr>().unwrap(),
+        decoder.decode::<Instr>().unwrap()
+    );
 }

@@ -1,38 +1,45 @@
-use crate::heap::handle::Handle;
-use crate::heap::trace::GcTrace;
+use crate::heap::{HeapObject, Trace, Tracer};
 use crate::value::DoughValue;
 
-#[derive(Debug)]
-pub struct DoughArray(Vec<DoughValue>);
+/// An array value allocated on the heap.
+pub(crate) struct DoughArray {
+    elements: Vec<DoughValue>,
+}
 
 impl DoughArray {
-    pub fn new(values: Vec<DoughValue>) -> Self {
-        Self(values)
+    pub(crate) fn new(len: usize) -> Self {
+        let mut elements = Vec::with_capacity(len);
+        elements.resize_with(len, || DoughValue::Unit);
+        Self { elements }
     }
 
-    pub fn len(&self) -> usize {
-        self.0.len()
+    /// Returns a reference to the element at `index`.
+    ///
+    /// # Panics
+    /// If `index` is out of bounds.
+    pub(crate) fn get(&self, index: usize) -> &DoughValue {
+        &self.elements[index]
     }
 
-    pub fn get(&self, index: usize) -> DoughValue {
-        self.0[index]
+    /// Set the element at `index` to `value`.
+    ///
+    /// # Panics
+    /// If `index` is out of bounds.
+    pub(crate) fn set(&mut self, index: usize, value: DoughValue) {
+        self.elements[index] = value;
     }
 
-    pub fn set(&mut self, index: usize, value: DoughValue) {
-        self.0[index] = value;
-    }
-
-    pub(crate) fn push(&mut self, value: DoughValue) {
-        self.0.push(value)
+    pub(crate) fn len(&self) -> usize {
+        self.elements.len()
     }
 }
 
-impl GcTrace for DoughArray {
-    fn references(&self) -> Vec<Handle> {
-        self.0.iter()
-            .filter_map(|val| match val {
-                DoughValue::Object(handle) => Some(*handle),
-                _ => None
-            }).collect()
+impl Trace for DoughArray {
+    fn trace(&self, tracer: &mut Tracer) {
+        for element in self.elements.iter() {
+            element.trace(tracer);
+        }
     }
 }
+
+impl HeapObject for DoughArray {}

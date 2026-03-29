@@ -1,24 +1,18 @@
-use std::fmt::{Display, Formatter};
-
-#[derive(Debug, Copy, Clone, PartialEq, Eq)]
+/// A range of byte offsets in source text.
+#[derive(Debug, Copy, Clone)]
 pub(crate) struct Span {
     start: usize,
-    end: usize
+    end: usize,
 }
 
 impl Span {
-    pub(crate) fn merge(a: Span, b: Span) -> Self {
-        Self {
-            start: a.start.min(b.start),
-            end: a.end.max(b.end)
-        }
-    }
-
+    /// Creates a new span from `start` to `end`.
+    ///
+    /// # Panics
+    /// If `start > end`.
     pub(crate) fn new(start: usize, end: usize) -> Self {
-        Self {
-            start: start.min(end),
-            end: start.max(end)
-        }
+        assert!(start <= end, "start must be <= end");
+        Self { start, end }
     }
 
     pub(crate) fn start(&self) -> usize {
@@ -29,17 +23,22 @@ impl Span {
         self.end
     }
 
-    pub(crate) fn merge_with(&self, other: Span) -> Self {
-        Self::merge(*self, other)
+    /// Extends this span to also cover `other`.
+    pub(crate) fn merge(self, other: Self) -> Self {
+        Self::new(
+            self.start.min(other.start),
+            self.end.max(other.end)
+        )
     }
 }
 
-impl Display for Span {
-    fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
+impl std::fmt::Display for Span {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "{}..{}", self.start, self.end)
     }
 }
 
+/// Implemented by types that originated from source text.
 pub(crate) trait Spanned {
     fn span(&self) -> Span;
 }

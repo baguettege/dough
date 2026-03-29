@@ -1,84 +1,83 @@
-use crate::heap::handle::Handle;
-use crate::heap::trace::GcTrace;
+use crate::heap::{Handle, Trace, Tracer};
 use crate::value::array::DoughArray;
 use crate::value::str::DoughStr;
 
-pub mod str;
-pub mod array;
+mod array;
+mod str;
 
-#[derive(Debug, Copy, Clone, PartialEq)]
-pub enum DoughValue {
+/// A runtime value in the Dough VM.
+pub(crate) enum DoughValue {
+    /// The unit value, used as a sentinel for uninitialized slots
+    /// and void function returns. Cannot be produced by user code.
     Unit,
+    
     Int(i64),
     Float(f64),
     Bool(bool),
-    Object(Handle)
+
+    Str(Handle<DoughStr>),
+    Array(Handle<DoughArray>),
+}
+
+macro_rules! primitive_accessors {
+    ($( $variant:ident, $type:ty; )+) => {
+        paste::paste! {
+            $(
+                pub(crate) fn [<as_ $variant:lower>](&self) -> $type {
+                    if let Self::$variant(v) = self {
+                        *v
+                    } else {
+                        unreachable!("expected {}", stringify!([<$variant:lower>]));
+                    }
+                }
+            )+
+        }
+    };
+}
+
+macro_rules! handle_accessors {
+    ($( $variant: ident, $type:ty; )+) => {
+        paste::paste! {
+            $(
+                pub(crate) fn [<as_ $variant:lower _handle>](&self) -> &Handle<$type> {
+                    if let Self::$variant(v) = self {
+                        v
+                    } else {
+                        unreachable!("expected {} handle", stringify!([<$variant:lower>]));
+                    }
+                }
+
+                pub(crate) fn [<as_ $variant:lower _handle_mut>](&mut self) -> &mut Handle<$type> {
+                    if let Self::$variant(v) = self {
+                        v
+                    } else {
+                        unreachable!("expected {} handle", stringify!([<$variant:lower>]));
+                    }
+                }
+            )+
+        }
+    };
 }
 
 impl DoughValue {
-    pub fn as_i64(&self) -> i64 {
-        match self {
-            DoughValue::Int(i) => *i,
-            _ => panic!("expected int, got {:?}", self)
-        }
+    primitive_accessors! {
+        Int, i64;
+        Float, f64;
+        Bool, bool;
     }
 
-    pub fn as_f64(&self) -> f64 {
-        match self {
-            DoughValue::Float(f) => *f,
-            _ => panic!("expected float, got {:?}", self)
-        }
-    }
-
-    pub fn as_bool(&self) -> bool {
-        match self {
-            DoughValue::Bool(b) => *b,
-            _ => panic!("expected bool, got {:?}", self)
-        }
-    }
-
-    pub fn as_handle(&self) -> Handle {
-        match self {
-            DoughValue::Object(h) => *h,
-            _ => panic!("expected handle, got {:?}", self)
-        }
+    handle_accessors! {
+        Str, DoughStr;
+        Array, DoughArray;
     }
 }
 
-#[derive(Debug)]
-pub(crate) enum DoughObject {
-    Str(DoughStr),
-    Array(DoughArray)
-}
-
-impl DoughObject {
-    pub(crate) fn as_str(&self) -> &DoughStr {
+impl Trace for DoughValue {
+    fn trace(&self, tracer: &mut Tracer) {
         match self {
-            DoughObject::Str(s) => s,
-            _ => panic!("expected str, got {:?}", self)
-        }
-    }
-
-    pub(crate) fn as_array(&self) -> &DoughArray {
-        match self {
-            DoughObject::Array(array) => array,
-            _ => panic!("expected array, got {:?}", self)
-        }
-    }
-
-    pub(crate) fn as_array_mut(&mut self) -> &mut DoughArray {
-        match self {
-            DoughObject::Array(array) => array,
-            _ => panic!("expected array, got {:?}", self)
-        }
-    }
-}
-
-impl GcTrace for DoughObject {
-    fn references(&self) -> Vec<Handle> {
-        match self {
-            DoughObject::Str(s) => s.references(),
-            DoughObject::Array(array) => array.references(),
+            DoughValue::Str(handle) => tracer.push(handle),
+            DoughValue::Array(handle) => tracer.push(handle),
+            _ => {}
         }
     }
 }

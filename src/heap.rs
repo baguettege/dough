@@ -1,99 +1,76 @@
-use crate::heap::handle::Handle;
-use crate::heap::slot::Slot;
-use crate::heap::trace::GcTrace;
-use crate::value::DoughObject;
+pub(crate) use handle::Handle;
+pub(crate) use tracer::{Trace, Tracer};
 
-pub mod handle;
-mod slot;
-pub(crate) mod trace;
+use crate::heap::gc::Gc;
+use crate::heap::meta::GcBox;
+use std::ptr::NonNull;
 
+mod gc;
+mod handle;
+mod meta;
+mod tracer;
+
+/// A type that can be allocated on the heap.
+pub(crate) trait HeapObject: Sized + Trace {}
+
+type Root = NonNull<u8>;
+
+/// A garbage collected heap.
+#[derive(Default)]
 pub(crate) struct Heap {
-    slots: Vec<Slot>,
-    free_head: Option<usize>
+    roots: Vec<Root>,
 }
 
 impl Heap {
     pub(crate) fn new() -> Self {
-        Self {
-            slots: Vec::new(),
-            free_head: None
-        }
+        Self::default()
     }
 
-    pub(crate) fn alloc(&mut self, object: DoughObject) -> Handle {
-        match self.free_head {
-            None => {
-                let index = self.slots.len();
-                let mut slot = Slot::new();
+    /// Allocates `object` on the heap, returning a handle to it.
+    pub(crate) fn alloc<T: HeapObject>(&mut self, object: T) -> Handle<T> {
+        let gc_box = GcBox::new(object);
+        let leaked = Box::leak(Box::new(gc_box));
+        let ptr = NonNull::new(leaked).unwrap();
 
-                slot.occupy(object);
-                self.slots.push(slot);
+        self.roots.push(ptr.cast());
 
-                Handle::new(index, 0)
-            }
-            Some(index) => {
-                let slot = &mut self.slots[index];
-                self.free_head = slot.next_free();
-
-                slot.occupy(object);
-
-                Handle::new(index, slot.generation())
-            }
-        }
+        // SAFETY: `ptr` points to a valid, initialized `GcBox<T>`,
+        // guaranteed above
+        unsafe { Handle::new(ptr) }
     }
 
-    pub(crate) fn deref(&self, handle: Handle) -> &DoughObject {
-        let slot = &self.slots[handle.index()];
+    /// Returns a reference to the object referenced by `handle`.
+    ///
+    /// # Panics
+    /// If the handle is stale.
+    pub(crate) fn get<T: HeapObject>(&self, handle: &Handle<T>) -> &T {
+        let ptr = handle.ptr();
+        assert!(self.roots.contains(&ptr.cast()), "stale handle");
 
-        if slot.matches_handle(handle) {
-            slot.get_object()
-        } else {
-            panic!("Stale handle {:?}", handle);
-        }
+        // SAFETY: `ptr` is valid and initialized as it exists in the root set,
+        // guaranteeing that the GC has not collected it
+        let gc_box = unsafe { ptr.as_ref() };
+
+        gc_box.object()
     }
 
-    pub(crate) fn deref_mut(&mut self, handle: Handle) -> &mut DoughObject {
-        let slot = &mut self.slots[handle.index()];
+    /// Returns a mutable reference to the object referenced by `handle`.
+    ///
+    /// # Panics
+    /// If the handle is stale.
+    pub(crate) fn get_mut<T: HeapObject>(&mut self, handle: &mut Handle<T>) -> &mut T {
+        let mut ptr = handle.ptr();
+        assert!(self.roots.contains(&ptr.cast()), "stale handle");
 
-        if slot.matches_handle(handle) {
-            slot.get_object_mut()
-        } else {
-            panic!("Stale handle {:?}", handle);
-        }
+        // SAFETY: `ptr` is valid and initialized as it exists in the root set,
+        // guaranteeing that the GC has not collected it
+        let gc_box = unsafe { ptr.as_mut() };
+
+        gc_box.object_mut()
     }
 
-    pub(crate) fn gc(&mut self, roots: &[Handle]) {
-        // mark
-        let mut worklist = roots.to_vec();
-
-        while let Some(handle) = worklist.pop() {
-            let slot = &mut self.slots[handle.index()];
-
-            if slot.is_freed() || !slot.matches_handle(handle) {
-                panic!("Stale handle {:?}", handle);
-            } else if slot.is_marked() {
-                continue;
-            }
-
-            slot.mark();
-
-            let children = slot.get_object().references();
-
-            worklist.extend(children);
-        }
-
-        // sweep
-        for (index, slot) in self.slots.iter_mut().enumerate() {
-            if slot.is_freed() {
-                continue;
-            }
-
-            if slot.is_marked() {
-                slot.unmark();
-            } else {
-                slot.free(self.free_head);
-                self.free_head = Some(index);
-            }
-        }
+    /// Runs a garbage collection cycle on this heap.
+    pub(crate) fn gc(&mut self) {
+        Gc::collect(self);
     }
 }

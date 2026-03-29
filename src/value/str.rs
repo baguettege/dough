@@ -1,25 +1,26 @@
-use crate::heap::handle::Handle;
-use crate::heap::trace::GcTrace;
+use crate::heap::{HeapObject, Trace, Tracer};
 
-#[derive(Debug)]
-pub struct DoughStr(String);
+/// A string value allocated on the heap.
+pub(crate) struct DoughStr {
+    string: String,
+}
 
 impl DoughStr {
-    pub fn new(s: impl Into<String>) -> Self {
-        Self(s.into())
+    pub(crate) fn new(string: impl Into<String>) -> Self {
+        Self { string: string.into() }
     }
 
-    pub fn as_str(&self) -> &str {
-        &self.0
+    pub(crate) fn as_str(&self) -> &str {
+        &self.string
     }
 
-    pub fn len(&self) -> usize {
-        self.0.len()
+    pub(crate) fn len(&self) -> usize {
+        self.string.len()
     }
 }
 
-impl GcTrace for DoughStr {
-    fn references(&self) -> Vec<Handle> {
-        Vec::new()
-    }
+impl Trace for DoughStr {
+    fn trace(&self, _: &mut Tracer) {}
 }
+
+impl HeapObject for DoughStr {}
