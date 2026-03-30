@@ -6,6 +6,7 @@ mod value;
 mod lexer;
 mod span;
 mod ast;
+mod parser;
 
 fn main() {
     let code = bytecode! {

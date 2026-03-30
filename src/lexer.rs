@@ -1,8 +1,10 @@
-use crate::lexer::token::{Token, TokenKind};
+pub(crate) use crate::lexer::token::{Token, TokenKind};
+
 use crate::span::Span;
 
 mod token;
 
+#[derive(Debug)]
 pub(crate) enum Error {
     UnexpectedChar(char, Span),
     UnterminatedString(Span),
@@ -58,7 +60,7 @@ impl<'a> Cursor<'a> {
     fn advance(&mut self) -> char {
         let c = self.peek();
 
-        if c != Self::EOF_CHAR {
+        if !self.is_at_end() {
             self.pos += c.len_utf8();
         }
 

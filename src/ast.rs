@@ -1,4 +1,4 @@
-use crate::ast::types::{BinaryOp, Literal, Name, Param, TypeRef, UnaryOp};
+pub(crate) use crate::ast::types::*;
 
 mod types;
 
@@ -15,6 +15,7 @@ macro_rules! ast {
         }
     ),* $(,)?) => {
         $(
+            #[derive(Debug)]
             pub(crate) enum $node {
                 $( $variant($variant) ),*
             }
@@ -28,6 +29,7 @@ macro_rules! ast {
             }
 
             $(
+                #[derive(Debug)]
                 pub(crate) struct $variant {
                     $( $field: $type, )*
                     span: $crate::span::Span,
@@ -72,18 +74,19 @@ ast! {
 
         If { condition: Expr, then_body: Block, else_body: Option<Block> },
         While { condition: Expr, body: Block },
+
         Return { value: Option<Expr> },
     },
 
     Expr {
         Binary { lhs: Box<Expr>, op: BinaryOp, rhs: Box<Expr> },
-        Unary { op: UnaryOp, operand: Box<Expr> },
+        Unary { op: UnaryOp, expr: Box<Expr> },
 
         Ident { name: Name },
 
-        Call { name: Name, args: Vec<Expr> },
+        Call { callee: Box<Expr>, args: Vec<Expr> },
         Index { array: Box<Expr>, index: Box<Expr> },
-        MemberAccess { object: Box<Expr>, member: Name },
+        Member { object: Box<Expr>, member: Name },
 
         Lit { value: Literal },
     },
@@ -91,5 +94,20 @@ ast! {
     Decl {
         Func { name: Name, params: Vec<Param>, return_type: TypeRef, body: Block },
         Var { name: Name, type_ref: TypeRef, init: Expr },
+    }
+}
+
+#[derive(Debug)]
+pub(crate) struct Program {
+    decls: Vec<Decl>,
+}
+
+impl Program {
+    pub(crate) fn new(decls: Vec<Decl>) -> Self {
+        Self { decls }
+    }
+    
+    pub(crate) fn decls(&self) -> &[Decl] {
+        &self.decls
     }
 }

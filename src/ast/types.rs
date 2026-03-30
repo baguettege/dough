@@ -1,7 +1,34 @@
 use crate::span::{Span, Spanned};
 
-pub(crate) type TypeRef = Name;
+#[derive(Debug)]
+pub(crate) struct TypeRef {
+    kind: TypeKind,
+    span: Span,
+}
 
+impl TypeRef {
+    pub(crate) fn new(kind: TypeKind, span: Span) -> Self {
+        Self { kind, span }
+    }
+
+    pub(crate) fn kind(&self) -> &TypeKind {
+        &self.kind
+    }
+}
+
+impl Spanned for TypeRef {
+    fn span(&self) -> Span {
+        self.span
+    }
+}
+
+#[derive(Debug)]
+pub(crate) enum TypeKind {
+    Name(Name),
+    Array(Box<TypeRef>),
+}
+
+#[derive(Debug)]
 pub(crate) struct Name {
     name: String,
     span: Span,
@@ -23,6 +50,7 @@ impl Spanned for Name {
     }
 }
 
+#[derive(Debug)]
 pub(crate) struct Param {
     name: Name,
     type_ref: TypeRef,
@@ -49,6 +77,7 @@ impl Spanned for Param {
     }
 }
 
+#[derive(Debug)]
 pub(crate) enum Literal {
     Int(i64),
     Float(f64),
@@ -56,6 +85,7 @@ pub(crate) enum Literal {
     Str(String),
 }
 
+#[derive(Debug, Copy, Clone)]
 pub(crate) enum BinaryOp {
     Mul,
     Div,
@@ -76,6 +106,7 @@ pub(crate) enum BinaryOp {
     Or,
 }
 
+#[derive(Debug, Copy, Clone)]
 pub(crate) enum UnaryOp {
     Not,
     Neg,

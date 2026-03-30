@@ -1,6 +1,7 @@
 use crate::span::{Span, Spanned};
 
 /// A token kind produced by the lexer.
+#[derive(PartialEq, Clone, Debug)]
 pub(crate) enum TokenKind {
     // literals
     Int(i64),
@@ -52,6 +53,7 @@ pub(crate) enum TokenKind {
 }
 
 /// A token with its kind and location in the source text.
+#[derive(Clone, Debug)]
 pub(crate) struct Token {
     kind: TokenKind,
     span: Span,
