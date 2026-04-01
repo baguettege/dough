@@ -92,7 +92,7 @@ ast! {
     },
 
     Decl {
-        Func { name: Name, params: Vec<Param>, return_type: TypeRef, body: Block },
+        Func { name: Name, params: Vec<Param>, return_type: Option<TypeRef>, body: Block },
         Var { name: Name, type_ref: TypeRef, init: Expr },
     }
 }

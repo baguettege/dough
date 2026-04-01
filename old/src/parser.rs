@@ -239,9 +239,13 @@ impl Parser {
         }
 
         self.cursor.expect(&TokenKind::RParen)?;
-        self.cursor.expect(&TokenKind::Colon)?;
 
-        let return_type = self.parse_type()?;
+        let return_type =
+            if self.cursor.match_kind(&TokenKind::Colon) {
+            Some(self.parse_type()?)
+        } else {
+            None
+        };
 
         let body = self.parse_block()?;
         let span = start.merge(body.span());
