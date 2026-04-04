@@ -34,7 +34,7 @@ impl Deref for TypeRef {
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, Copy, Clone)]
 pub enum BinOp {
     Mul,
     Div,
@@ -55,7 +55,7 @@ pub enum BinOp {
     Or,
 }
 
-#[derive(Debug)]
+#[derive(Debug, Copy, Clone)]
 pub enum UnOp {
     Not,
     Neg,

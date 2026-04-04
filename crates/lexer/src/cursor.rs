@@ -10,7 +10,7 @@ impl<'a> Cursor<'a> {
         Self { input, pos: 0 }
     }
 
-    pub(crate) fn peek(&mut self) -> Option<char> {
+    pub(crate) fn peek(&self) -> Option<char> {
         self.input[self.pos..].chars().next()
     }
 
@@ -33,12 +33,8 @@ impl<'a> Cursor<'a> {
 
     pub(crate) fn advance_while(&mut self, pred: impl Fn(char) -> bool) -> &str {
         let start_pos = self.pos;
-
         while let Some(c) = self.peek() {
-            if !pred(c) {
-                break;
-            }
-            
+            if !pred(c) { break; }
             self.advance();
         }
 
@@ -46,7 +42,7 @@ impl<'a> Cursor<'a> {
     }
 
     #[allow(clippy::wrong_self_convention)]
-    pub(crate) fn is_at_end(&mut self) -> bool {
+    pub(crate) fn is_at_end(&self) -> bool {
         self.peek().is_none()
     }
 }

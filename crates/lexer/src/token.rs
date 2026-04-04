@@ -1,4 +1,4 @@
-#[derive(Debug)]
+#[derive(Debug, PartialEq, Clone)]
 pub enum Token {
     Int(i64),
     Float(f64),
@@ -9,6 +9,7 @@ pub enum Token {
 
     Fn,
     Let,
+    Static,
     If,
     Else,
     While,

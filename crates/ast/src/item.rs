@@ -10,7 +10,7 @@ pub enum Item<T = ()> {
         return_ty: Option<TypeRef>,
         body: Block<T>,
     },
-    Global {
+    Static {
         ident: Ident,
         ty: TypeRef,
         init: Expr<T>,

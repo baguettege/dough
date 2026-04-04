@@ -22,6 +22,7 @@ impl<'a> Lexer<'a> {
             tokens.push(token);
         }
 
+        tokens.push(Token::Eof);
         Ok(tokens)
     }
 
