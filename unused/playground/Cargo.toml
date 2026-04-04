@@ -1,0 +1,10 @@
+[package]
+name = "playground"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]
+dough = { path = "../dough" }
+ast_macros = { path = "../ast_macros" }
+ast = { path = "../ast" }
+vm = { path = "../vm" }

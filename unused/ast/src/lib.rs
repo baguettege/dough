@@ -1,6 +1,7 @@
 mod expr;
 mod stmt;
 mod item;
+mod macros;
 
 pub mod types;
 
