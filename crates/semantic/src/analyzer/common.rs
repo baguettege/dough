@@ -7,8 +7,13 @@ use crate::{Error, Result};
 use crate::symbol::Symbol;
 
 impl Analyzer {
+    /// Returns `self.return_ty`.
+    ///
+    /// This method acts as a convenience for accessing `return_ty`,
+    /// as it is invariant that it is never `None`, due to return
+    /// nodes being non-existant at the global scope.
     pub(super) fn return_ty(&self) -> Type {
-        self.return_ty.expect("return_ty unset outside fn")
+        self.return_ty.expect("return_ty unset outside a function")
     }
 
     pub(super) fn analyze_block(&mut self, block: &untyped::Block) -> Result<Block> {
@@ -18,6 +23,7 @@ impl Analyzer {
             .collect()
     }
 
+    /// Runs `f` inside a new scope, pushing before and popping after.
     pub(super) fn with_scope<T, F>(&mut self, f: F) -> Result<T>
     where
         F: FnOnce(&mut Self) -> Result<T>
@@ -27,7 +33,9 @@ impl Analyzer {
         self.stack.pop();
         result
     }
-    
+
+    /// Looks up `ident` in the local and global scope, returning
+    /// the type of the variable or `Err` if not found.
     pub(super) fn lookup_var(&mut self, ident: &Ident) -> Result<Type> {
         self.stack.lookup(ident)
             .or_else(|| match self.table.lookup(ident) {

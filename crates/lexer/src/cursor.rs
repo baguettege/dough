@@ -31,6 +31,7 @@ impl<'a> Cursor<'a> {
         }
     }
 
+    /// Repeatedly advances this cursor whilst `pred` holds.
     pub(crate) fn advance_while(&mut self, pred: impl Fn(char) -> bool) -> &str {
         let start_pos = self.pos;
         while let Some(c) = self.peek() {
@@ -41,7 +42,6 @@ impl<'a> Cursor<'a> {
         &self.input[start_pos..self.pos]
     }
 
-    #[allow(clippy::wrong_self_convention)]
     pub(crate) fn is_at_end(&self) -> bool {
         self.peek().is_none()
     }

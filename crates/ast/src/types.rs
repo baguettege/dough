@@ -1,3 +1,5 @@
+//! Supporting types for the AST.
+
 use std::ops::Deref;
 
 #[derive(Debug, Clone, Eq, PartialEq, Hash)]

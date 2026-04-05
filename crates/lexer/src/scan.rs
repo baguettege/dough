@@ -1,3 +1,5 @@
+//! Maps keywords, punctuation, and operators to their corresponding tokens.
+
 use crate::cursor::Cursor;
 use crate::Token;
 

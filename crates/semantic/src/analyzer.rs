@@ -24,6 +24,11 @@ impl Analyzer {
     }
 
     pub(crate) fn analyze(mut self, program: &untyped::Program) -> Result<TypedProgram> {
+        // 3-step process:
+        // - register all top-level items,
+        // - validate the main function,
+        // - walk and analyze all item bodies
+        
         for item in program {
             self.register(item)?;
         }
@@ -38,6 +43,8 @@ impl Analyzer {
         Ok(TypedProgram::new(typed, self.table))
     }
 
+    /// Validates that the current symbol table contains a [`Symbol::Fn`]
+    /// with the ident `main`, return type `Type::Unit`, and no parameters.
     fn validate_main(&self) -> Result<()> {
         match self.table.lookup(&Ident::new("main")) {
             Some(Symbol::Fn { params, return_ty }) => {
@@ -49,6 +56,9 @@ impl Analyzer {
         }
     }
 
+    /// Registers a top-level item into the symbol table, without
+    /// walking its body. Runs before `analyze_item` so that forward
+    /// declarations are possible.
     fn register(&mut self, item: &untyped::Item) -> Result<()> {
         match item {
             untyped::Item::Fn { ident, params, return_ty, .. } => {

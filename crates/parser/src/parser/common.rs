@@ -40,6 +40,12 @@ impl Parser<'_> {
         Ok(stmts)
     }
 
+    /// Parses a comma-separated list, calling `f` for every comma encountered.
+    /// 
+    /// Expects an opening `(` and a closing `)`.
+    /// 
+    /// Repeated calls `f` until it sees a `)`, or the end of input, and returns
+    /// a `Vec` of the parsed items.
     pub(super) fn parse_comma_separated<T, F>(&mut self, mut f: F) -> Result<Vec<T>>
     where
         F: FnMut(&mut Self) -> Result<T>

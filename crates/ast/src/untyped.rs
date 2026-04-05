@@ -1,3 +1,5 @@
+//! The untyped AST.
+
 mod expr;
 mod stmt;
 mod item;
