@@ -1,4 +1,4 @@
-use ast::Expr;
+use ast::untyped::Expr;
 use ast::types::{BinOp, Literal, UnOp};
 use lexer::Token;
 use crate::parser::Parser;
@@ -40,7 +40,6 @@ impl Parser<'_> {
                 lhs: Box::new(lhs),
                 op,
                 rhs: Box::new(rhs),
-                ty: (),
             };
         }
 
@@ -55,7 +54,6 @@ impl Parser<'_> {
                 Ok(Expr::Unary {
                     op,
                     expr: Box::new(expr),
-                    ty: (),
                 })
             },
             None => self.parse_primary(),
@@ -101,7 +99,7 @@ impl Parser<'_> {
 
     fn parse_ident_expr(&mut self) -> Result<Expr> {
         let ident = self.parse_ident()?;
-        Ok(Expr::Ident { ident, ty: () })
+        Ok(Expr::Ident(ident))
     }
 
     fn parse_call(&mut self) -> Result<Expr> {
@@ -109,10 +107,10 @@ impl Parser<'_> {
 
         expect!(self, Token::LParen);
         let args = self.parse_comma_separated(
-            |parser| parser.parse_expr())?;
+            |this| this.parse_expr())?;
         expect!(self, Token::RParen);
 
-        Ok(Expr::Call { callee, args, ty: () })
+        Ok(Expr::Call { callee, args })
     }
 }
 

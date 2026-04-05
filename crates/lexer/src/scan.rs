@@ -50,6 +50,7 @@ pub(crate) fn from_punct(cursor: &mut Cursor) -> Option<Token> {
         '{' => Token::LBrace,
         '}' => Token::RBrace,
         ',' => Token::Comma,
+        ':' => Token::Colon,
         ';' => Token::Semicolon,
     }
 }

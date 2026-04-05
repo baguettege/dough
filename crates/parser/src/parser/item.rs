@@ -1,5 +1,4 @@
-use ast::Item;
-use ast::types::Param;
+use ast::untyped::{Item, Param};
 use lexer::Token;
 use crate::parser::Parser;
 use crate::{Result, Error};
@@ -19,10 +18,10 @@ impl Parser<'_> {
         let ident = self.parse_ident()?;
         expect!(self, Token::LParen);
 
-        let params = self.parse_comma_separated(|parser| {
-            let ident = parser.parse_ident()?;
-            expect!(parser, Token::Colon);
-            let ty = parser.parse_type()?;
+        let params = self.parse_comma_separated(|this| {
+            let ident = this.parse_ident()?;
+            expect!(this, Token::Colon);
+            let ty = this.parse_type()?;
             Ok(Param::new(ident, ty))
         })?;
 

@@ -1,6 +1,6 @@
 use std::ops::Deref;
 
-#[derive(Debug)]
+#[derive(Debug, Clone, Eq, PartialEq, Hash)]
 pub struct Ident(String);
 
 impl Ident {
@@ -17,7 +17,7 @@ impl Deref for Ident {
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct TypeRef(Ident);
 
 impl TypeRef {
@@ -61,30 +61,10 @@ pub enum UnOp {
     Neg,
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub enum Literal {
     Int(i64),
     Float(f64),
     Bool(bool),
     Str(String),
-}
-
-#[derive(Debug)]
-pub struct Param {
-    ident: Ident,
-    ty: TypeRef,
-}
-
-impl Param {
-    pub fn new(ident: Ident, ty: TypeRef) -> Self {
-        Self { ident, ty }
-    }
-
-    pub fn ident(&self) -> &Ident {
-        &self.ident
-    }
-
-    pub fn ty(&self) -> &TypeRef {
-        &self.ty
-    }
 }

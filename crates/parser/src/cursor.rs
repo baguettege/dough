@@ -26,7 +26,7 @@ impl<'a> Cursor<'a> {
 
     pub(crate) fn is_at_end(&self) -> bool {
         if let Some(token) = self.peek() {
-            token == &Token::Eof
+            matches!(token, Token::Eof)
         } else {
             true
         }

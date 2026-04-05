@@ -1,4 +1,4 @@
-use ast::Block;
+use ast::untyped::Block;
 use ast::types::{Ident, TypeRef};
 use lexer::Token;
 use crate::parser::Parser;

@@ -1,4 +1,4 @@
-use ast::Stmt;
+use ast::untyped::Stmt;
 use lexer::Token;
 use crate::parser::Parser;
 use crate::{Result, Error};

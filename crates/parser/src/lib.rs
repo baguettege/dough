@@ -2,7 +2,7 @@ mod error;
 mod cursor;
 mod parser;
 
-use ast::Program;
+use ast::untyped::Program;
 use lexer::Token;
 
 pub use error::{Error, Result};
