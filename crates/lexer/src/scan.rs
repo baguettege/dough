@@ -15,6 +15,8 @@ pub(crate) fn from_keyword(keyword: &str) -> Option<Token> {
         "and" => Some(Token::And),
         "or" => Some(Token::Or),
         "not" => Some(Token::Not),
+        "true" => Some(Token::Bool(true)),
+        "false" => Some(Token::Bool(false)),
         _ => None,
     }
 }

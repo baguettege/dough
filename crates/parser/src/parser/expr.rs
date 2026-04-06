@@ -1,4 +1,4 @@
-use ast::untyped::Expr;
+use ast::untyped::{Binary, Call, Expr, Ident, LiteralExpr, Unary};
 use ast::types::{BinOp, Literal, UnOp};
 use lexer::Token;
 use crate::parser::Parser;
@@ -36,11 +36,7 @@ impl Parser<'_> {
             let rhs = self.parse_operand()?;
             let rhs = self.parse_expr_inner(rhs, precedence + 1)?;
 
-            lhs = Expr::Binary {
-                lhs: Box::new(lhs),
-                op,
-                rhs: Box::new(rhs),
-            };
+            lhs = Binary::new(self.next_id(), Box::new(lhs), op, Box::new(rhs)).into();
         }
 
         Ok(lhs)
@@ -51,10 +47,8 @@ impl Parser<'_> {
             Some(op) => {
                 self.cursor.advance();
                 let expr = self.parse_operand()?;
-                Ok(Expr::Unary {
-                    op,
-                    expr: Box::new(expr),
-                })
+                
+                Ok(Unary::new(self.next_id(), op, Box::new(expr)).into())
             },
             None => self.parse_primary(),
         }
@@ -62,14 +56,15 @@ impl Parser<'_> {
 
     fn parse_primary(&mut self) -> Result<Expr> {
         match self.cursor.peek() {
-            Some(Token::Int(_) | Token::Float(_) | Token::Bool(_) |
-                 Token::Str(_)) => self.parse_literal(),
+            Some(Token::Int(_) | Token::Float(_) |
+                 Token::Bool(_) | Token::Str(_)) =>
+                self.parse_literal().map(Into::into),
             Some(Token::LParen) => self.parse_grouped(),
             Some(Token::Ident(_)) => {
                 if matches!(self.cursor.peek_ahead(1), Some(Token::LParen)) {
-                    self.parse_call()
+                    self.parse_call().map(Into::into)
                 } else {
-                    self.parse_ident_expr()
+                    self.parse_ident_expr().map(Into::into)
                 }
             },
             Some(token) => Err(Error::UnexpectedToken(token.clone())),
@@ -77,7 +72,7 @@ impl Parser<'_> {
         }
     }
 
-    fn parse_literal(&mut self) -> Result<Expr> {
+    fn parse_literal(&mut self) -> Result<LiteralExpr> {
         let literal = match self.cursor.advance() {
             Some(Token::Int(i)) => Literal::Int(*i),
             Some(Token::Float(f)) => Literal::Float(*f),
@@ -86,8 +81,8 @@ impl Parser<'_> {
             Some(token) => return Err(Error::UnexpectedToken(token.clone())),
             None => return Err(Error::UnexpectedEof),
         };
-
-        Ok(Expr::Literal(literal))
+        
+        Ok(LiteralExpr::new(self.next_id(), literal))
     }
 
     fn parse_grouped(&mut self) -> Result<Expr> {
@@ -97,12 +92,12 @@ impl Parser<'_> {
         Ok(expr)
     }
 
-    fn parse_ident_expr(&mut self) -> Result<Expr> {
+    fn parse_ident_expr(&mut self) -> Result<Ident> {
         let ident = self.parse_ident()?;
-        Ok(Expr::Ident(ident))
+        Ok(Ident::new(self.next_id(), ident))
     }
 
-    fn parse_call(&mut self) -> Result<Expr> {
+    fn parse_call(&mut self) -> Result<Call> {
         let callee = self.parse_ident()?;
 
         expect!(self, Token::LParen);
@@ -110,7 +105,7 @@ impl Parser<'_> {
             |this| this.parse_expr())?;
         expect!(self, Token::RParen);
 
-        Ok(Expr::Call { callee, args })
+        Ok(Call::new(self.next_id(), callee, args))
     }
 }
 

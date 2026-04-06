@@ -1,34 +1,35 @@
-use crate::untyped::Expr;
+use crate::types::TypeRef;
 use crate::untyped::stmt::Block;
-use crate::types::{Ident, TypeRef};
+use crate::untyped::Expr;
 
-#[derive(Debug)]
-pub enum Item {
-    Fn {
-        ident: Ident,
-        params: Vec<Param>,
-        return_ty: Option<TypeRef>,
-        body: Block,
-    },
-    Static {
-        ident: Ident,
-        ty: TypeRef,
-        init: Expr,
-    },
+node! {
+    Item {
+        Fn {
+            ident: String,
+            params: Vec<Param>,
+            return_ty: Option<TypeRef>,
+            body: Block,
+        },
+        Static {
+            ident: String,
+            ty: TypeRef,
+            init: Expr,
+        },
+    }
 }
 
 #[derive(Debug)]
 pub struct Param {
-    ident: Ident,
+    ident: String,
     ty: TypeRef,
 }
 
 impl Param {
-    pub fn new(ident: Ident, ty: TypeRef) -> Self {
+    pub fn new(ident: String, ty: TypeRef) -> Self {
         Self { ident, ty }
     }
 
-    pub fn ident(&self) -> &Ident {
+    pub fn ident(&self) -> &str {
         &self.ident
     }
 

@@ -1,4 +1,4 @@
-use ast::untyped::{Item, Param};
+use ast::untyped::{Item, Param, Fn, Static};
 use lexer::Token;
 use crate::parser::Parser;
 use crate::{Result, Error};
@@ -6,14 +6,14 @@ use crate::{Result, Error};
 impl Parser<'_> {
     pub(super) fn parse_item(&mut self) -> Result<Item> {
         match self.cursor.peek() {
-            Some(Token::Fn) => self.parse_fn(),
-            Some(Token::Static) => self.parse_static(),
+            Some(Token::Fn) => self.parse_fn().map(Into::into),
+            Some(Token::Static) => self.parse_static().map(Into::into),
             Some(token) => Err(Error::UnexpectedToken(token.clone())),
             None => Err(Error::UnexpectedEof),
         }
     }
 
-    fn parse_fn(&mut self) -> Result<Item> {
+    fn parse_fn(&mut self) -> Result<Fn> {
         expect!(self, Token::Fn);
         let ident = self.parse_ident()?;
         expect!(self, Token::LParen);
@@ -37,10 +37,10 @@ impl Parser<'_> {
 
         let body = self.parse_block()?;
 
-        Ok(Item::Fn { ident, params, return_ty, body })
+        Ok(Fn::new(self.next_id(), ident, params, return_ty, body))
     }
 
-    fn parse_static(&mut self) -> Result<Item> {
+    fn parse_static(&mut self) -> Result<Static> {
         expect!(self, Token::Static);
         let ident = self.parse_ident()?;
         expect!(self, Token::Colon);
@@ -48,7 +48,7 @@ impl Parser<'_> {
         expect!(self, Token::Assign);
         let init = self.parse_expr()?;
         expect!(self, Token::Semicolon);
-
-        Ok(Item::Static { ident, ty, init })
+        
+        Ok(Static::new(self.next_id(), ident, ty, init))
     }
 }

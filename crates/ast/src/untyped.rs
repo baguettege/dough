@@ -1,11 +1,9 @@
-//! The untyped AST.
-
 mod expr;
 mod stmt;
 mod item;
 
-pub use expr::Expr;
-pub use stmt::{Block, Stmt};
-pub use item::{Item, Param};
+pub use expr::*;
+pub use item::*;
+pub use stmt::*;
 
 pub type Program = Vec<Item>;

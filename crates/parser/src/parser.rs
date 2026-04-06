@@ -1,3 +1,4 @@
+use ast::NodeId;
 use crate::cursor::Cursor;
 use crate::Result;
 use ast::untyped::Program;
@@ -20,11 +21,13 @@ mod common;
 
 pub(crate) struct Parser<'a> {
     cursor: Cursor<'a>,
+    id: IdGen,
 }
 
 impl<'a> Parser<'a> {
     pub(crate) fn new(tokens: &'a [Token]) -> Self {
-        Self { cursor: Cursor::new(tokens) }
+        let (cursor, id) = (Cursor::new(tokens), IdGen::new());
+        Self { cursor, id }
     }
 
     pub(crate) fn parse(mut self) -> Result<Program> {
@@ -36,5 +39,19 @@ impl<'a> Parser<'a> {
         }
 
         Ok(items)
+    }
+}
+
+struct IdGen(NodeId);
+
+impl IdGen {
+    fn new() -> Self {
+        Self(0)
+    }
+
+    fn next(&mut self) -> NodeId {
+        let id = self.0;
+        self.0 += 1;
+        id
     }
 }

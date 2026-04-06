@@ -1,34 +1,34 @@
-use dough_core::Type;
 use crate::typed::{Block, Expr};
-use crate::types::Ident;
+use dough_core::Type;
 
-#[derive(Debug)]
-pub enum Item {
-    Fn {
-        ident: Ident,
-        params: Vec<Param>,
-        return_ty: Type,
-        body: Block,
-    },
-    Static {
-        ident: Ident,
-        ty: Type,
-        init: Expr,
-    },
+node! {
+    Item {
+        Fn {
+            ident: String,
+            params: Vec<Param>,
+            return_ty: Type,
+            body: Block,
+        },
+        Static {
+            ident: String,
+            ty: Type,
+            init: Expr,
+        },
+    }
 }
 
 #[derive(Debug)]
 pub struct Param {
-    ident: Ident,
+    ident: String,
     ty: Type,
 }
 
 impl Param {
-    pub fn new(ident: Ident, ty: Type) -> Self {
+    pub fn new(ident: String, ty: Type) -> Self {
         Self { ident, ty }
     }
 
-    pub fn ident(&self) -> &Ident {
+    pub fn ident(&self) -> &str {
         &self.ident
     }
 

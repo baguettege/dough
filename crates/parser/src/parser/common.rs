@@ -1,13 +1,18 @@
+use ast::NodeId;
 use ast::untyped::Block;
-use ast::types::{Ident, TypeRef};
+use ast::types::TypeRef;
 use lexer::Token;
 use crate::parser::Parser;
 use crate::{Result, Error};
 
 impl Parser<'_> {
-    pub(super) fn parse_ident(&mut self) -> Result<Ident> {
+    pub(super) fn next_id(&mut self) -> NodeId {
+        self.id.next()
+    }
+    
+    pub(super) fn parse_ident(&mut self) -> Result<String> {
         match self.cursor.advance() {
-            Some(Token::Ident(s)) => Ok(Ident::new(s)),
+            Some(Token::Ident(s)) => Ok(s.clone()),
             Some(token) => Err(Error::UnexpectedToken(token.clone())),
             None => Err(Error::UnexpectedEof),
         }
@@ -41,9 +46,9 @@ impl Parser<'_> {
     }
 
     /// Parses a comma-separated list, calling `f` for every comma encountered.
-    /// 
+    ///
     /// Expects an opening `(` and a closing `)`.
-    /// 
+    ///
     /// Repeated calls `f` until it sees a `)`, or the end of input, and returns
     /// a `Vec` of the parsed items.
     pub(super) fn parse_comma_separated<T, F>(&mut self, mut f: F) -> Result<Vec<T>>

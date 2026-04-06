@@ -1,35 +1,14 @@
-//! Supporting types for the AST.
-
-use std::ops::Deref;
-
-#[derive(Debug, Clone, Eq, PartialEq, Hash)]
-pub struct Ident(String);
-
-impl Ident {
-    pub fn new(s: impl Into<String>) -> Self {
-        Self(s.into())
-    }
-}
-
-impl Deref for Ident {
-    type Target = str;
-
-    fn deref(&self) -> &Self::Target {
-        &self.0
-    }
-}
-
 #[derive(Debug, Clone)]
-pub struct TypeRef(Ident);
+pub struct TypeRef(String);
 
 impl TypeRef {
-    pub fn new(ident: Ident) -> Self {
+    pub fn new(ident: String) -> Self {
         Self(ident)
     }
 }
 
-impl Deref for TypeRef {
-    type Target = Ident;
+impl std::ops::Deref for TypeRef {
+    type Target = String;
 
     fn deref(&self) -> &Self::Target {
         &self.0

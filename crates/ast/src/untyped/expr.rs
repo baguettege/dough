@@ -1,21 +1,25 @@
-use crate::types::{BinOp, Ident, Literal, UnOp};
+use crate::types::{BinOp, Literal, UnOp};
 
-#[derive(Debug)]
-pub enum Expr {
-    Literal(Literal),
-    Ident(Ident),
-
-    Binary {
-        lhs: Box<Expr>,
-        op: BinOp,
-        rhs: Box<Expr>,
-    },
-    Unary {
-        op: UnOp,
-        expr: Box<Expr>,
-    },
-    Call {
-        callee: Ident,
-        args: Vec<Expr>,
-    },
+node! {
+    Expr {
+        LiteralExpr {
+            literal: Literal,
+        },
+        Ident {
+            ident: String,
+        },
+        Binary {
+            lhs: Box<Expr>,
+            op: BinOp,
+            rhs: Box<Expr>,
+        },
+        Unary {
+            op: UnOp,
+            expr: Box<Expr>,
+        },
+        Call {
+            callee: String,
+            args: Vec<Expr>,
+        },
+    }
 }
