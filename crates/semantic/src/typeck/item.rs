@@ -15,14 +15,14 @@ impl TypeChecker<'_> {
 
     fn check_fn(&mut self, node: &untyped::Fn) -> Result<Fn> {
         // resolver guarantees this is a `Symbol::Fn`
-        let Symbol::Fn { params, return_ty } = self.bindings.get(node)
+        let Symbol::Fn { params, return_ty, .. } = self.bindings.get(node)
         else { unreachable!() };
 
         let params = params
             .iter()
             .zip(node.params())
             .map(|(&ty, param)|
-                Param::new(param.ident().into(), ty))
+                Param::new(param.id(), param.ident(), ty))
             .collect::<Vec<_>>();
 
         self.return_ty = Some(*return_ty);
@@ -39,7 +39,7 @@ impl TypeChecker<'_> {
     }
 
     fn check_static(&self, node: &untyped::Static) -> Result<Static> {
-        let Symbol::Global(ty) = self.bindings.get(node)
+        let Symbol::Global { ty, .. } = self.bindings.get(node)
         else { unreachable!() };
 
         let init = self.check_expr(node.init())?;

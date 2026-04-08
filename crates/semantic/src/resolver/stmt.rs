@@ -1,3 +1,4 @@
+use ast::Node;
 use ast::untyped::{Assign, ExprStmt, If, Let, Return, Stmt, While};
 use crate::resolver::{ty, Resolver};
 pub use crate::Result;
@@ -25,7 +26,7 @@ impl Resolver {
         self.resolve_expr(node.init())?;
 
         let ty = ty::resolve(node.ty())?;
-        let symbol = Symbol::Local(ty);
+        let symbol = Symbol::Local { id: node.id(), ty };
         self.define(node, node.ident(), symbol)?;
 
         Ok(())

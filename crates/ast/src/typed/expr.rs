@@ -1,4 +1,5 @@
 use dough_core::Type;
+use crate::NodeId;
 use crate::types::{BinOp, Literal, UnOp};
 
 node! {
@@ -9,6 +10,7 @@ node! {
         Ident {
             ident: String,
             ty: Type,
+            binding: NodeId,
         },
         Binary {
             lhs: Box<Expr>,
@@ -25,6 +27,7 @@ node! {
             callee: String,
             args: Vec<Expr>,
             ty: Type,
+            binding: NodeId,
         },
     }
 }

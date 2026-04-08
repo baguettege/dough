@@ -1,3 +1,4 @@
+use ast::Node;
 use ast::untyped::{Item, Fn, Static};
 use crate::resolver::{ty, Resolver};
 use crate::Result;
@@ -16,10 +17,9 @@ impl Resolver {
         self.with_scope(|this| {
             for param in node.params() {
                 let ty = ty::resolve(param.ty())?;
-                let symbol = Symbol::Local(ty);
-
-                // params are locally scoped only
-                this.scope.define(param.ident(), symbol);
+                let symbol = Symbol::Local { id: param.id(), ty };
+                
+                this.define(param, param.ident(), symbol)?;
             }
 
             this.resolve_block(node.body())?;
@@ -33,7 +33,7 @@ impl Resolver {
         self.resolve_expr(node.init())?;
 
         let ty = ty::resolve(node.ty())?;
-        let symbol = Symbol::Global(ty);
+        let symbol = Symbol::Global { id: node.id(), ty };
         self.define(node, node.ident(), symbol)?;
 
         Ok(())

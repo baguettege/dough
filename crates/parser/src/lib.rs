@@ -11,5 +11,5 @@ pub use error::{Error, Result};
 
 /// Parses `tokens` into an untyped [`Program`].
 pub fn parse(tokens: &[Token]) -> Result<Program> {
-    parser::Parser::new(&tokens).parse()
+    parser::parse(tokens)
 }

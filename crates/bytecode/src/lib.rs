@@ -7,7 +7,7 @@ mod chunk;
 mod program;
 
 pub use instr::Instr;
-pub use chunk::Chunk;
+pub use chunk::{Chunk, Constant};
 pub use program::Program;
 pub use types::{Opcode, Reg, Off, Idx, Argc};
 pub use encode::{Encode, Encoder};

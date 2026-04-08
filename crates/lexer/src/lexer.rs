@@ -2,16 +2,16 @@ use crate::cursor::Cursor;
 use crate::{Error, Result, Token};
 use crate::scan;
 
-pub(crate) struct Lexer<'a> {
+struct Lexer<'a> {
     cursor: Cursor<'a>,
 }
 
 impl<'a> Lexer<'a> {
-    pub(crate) fn new(input: &'a str) -> Self {
+    fn new(input: &'a str) -> Self {
         Self { cursor: Cursor::new(input) }
     }
 
-    pub(crate) fn lex(mut self) -> Result<Vec<Token>> {
+    fn lex(mut self) -> Result<Vec<Token>> {
         let mut tokens = Vec::new();
 
         while !self.cursor.is_at_end() {
@@ -76,4 +76,8 @@ impl<'a> Lexer<'a> {
         self.cursor.expect('"')?;
         Ok(Token::Str(s))
     }
+}
+
+pub(crate) fn lex(input: &str) -> Result<Vec<Token>> {
+    Lexer::new(input).lex()
 }

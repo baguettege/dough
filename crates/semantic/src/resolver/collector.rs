@@ -1,3 +1,4 @@
+use ast::Node;
 use crate::resolver::{ty, Resolver};
 use crate::symbol::Symbol;
 use crate::Result;
@@ -34,8 +35,9 @@ impl<'a> Collector<'a> {
             .map(ty::resolve)
             .transpose()?
             .unwrap_or(Type::Unit);
+        let id = node.id();
 
-        let symbol = Symbol::Fn { params, return_ty };
+        let symbol = Symbol::Fn { params, return_ty, id };
         self.resolver.define(node, node.ident(), symbol)?;
 
         Ok(())

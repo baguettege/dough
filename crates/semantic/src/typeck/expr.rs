@@ -23,12 +23,12 @@ impl TypeChecker<'_> {
     }
 
     fn check_ident(&self, node: &untyped::Ident) -> Result<Ident> {
-        let ty = match self.bindings.get(node) {
-            Symbol::Global(ty) | Symbol::Local(ty) => *ty,
+        let (ty, id) = match self.bindings.get(node) {
+            Symbol::Global { ty, id } | Symbol::Local{ ty, id } => (*ty, *id),
             Symbol::Fn { .. } => return Err(Error::NotAValue(node.ident().clone())),
         };
 
-        Ok(Ident::new(node.id(), node.ident().clone(), ty))
+        Ok(Ident::new(node.id(), node.ident().clone(), ty, id))
     }
 
     fn check_binary(&self, node: &untyped::Binary) -> Result<Binary> {
@@ -75,7 +75,7 @@ impl TypeChecker<'_> {
     }
 
     fn check_call(&self, node: &untyped::Call) -> Result<Call> {
-        let Symbol::Fn { params, return_ty } = self.bindings.get(node)
+        let Symbol::Fn { params, return_ty, id } = self.bindings.get(node)
         else { return Err(Error::NotCallable(node.callee().clone())) };
 
         let args = node.args();
@@ -96,6 +96,6 @@ impl TypeChecker<'_> {
             })
             .collect::<Result<Vec<_>>>()?;
 
-        Ok(Call::new(node.id(), node.callee().clone(), args, *return_ty))
+        Ok(Call::new(node.id(), node.callee().clone(), args, *return_ty, *id))
     }
 }

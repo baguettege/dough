@@ -1,5 +1,6 @@
 use crate::typed::{Block, Expr};
 use dough_core::Type;
+use crate::{Node, NodeId};
 
 node! {
     Item {
@@ -19,13 +20,15 @@ node! {
 
 #[derive(Debug)]
 pub struct Param {
+    id: NodeId,
     ident: String,
     ty: Type,
 }
 
 impl Param {
-    pub fn new(ident: String, ty: Type) -> Self {
-        Self { ident, ty }
+    pub fn new(id: NodeId, ident: impl Into<String>, ty: Type) -> Self {
+        let ident = ident.into();
+        Self { id, ident, ty }
     }
 
     pub fn ident(&self) -> &str {
@@ -34,5 +37,11 @@ impl Param {
 
     pub fn ty(&self) -> Type {
         self.ty
+    }
+}
+
+impl Node for Param {
+    fn id(&self) -> NodeId {
+        self.id
     }
 }

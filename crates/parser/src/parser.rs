@@ -19,18 +19,18 @@ mod stmt;
 mod item;
 mod common;
 
-pub(crate) struct Parser<'a> {
+struct Parser<'a> {
     cursor: Cursor<'a>,
     id: IdGen,
 }
 
 impl<'a> Parser<'a> {
-    pub(crate) fn new(tokens: &'a [Token]) -> Self {
+    fn new(tokens: &'a [Token]) -> Self {
         let (cursor, id) = (Cursor::new(tokens), IdGen::new());
         Self { cursor, id }
     }
 
-    pub(crate) fn parse(mut self) -> Result<Program> {
+    fn parse(mut self) -> Result<Program> {
         let mut items = Vec::new();
 
         while !self.cursor.is_at_end() {
@@ -54,4 +54,8 @@ impl IdGen {
         self.0 += 1;
         id
     }
+}
+
+pub(crate) fn parse(tokens: &[Token]) -> Result<Program> {
+    Parser::new(tokens).parse()
 }

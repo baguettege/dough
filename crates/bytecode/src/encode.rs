@@ -17,6 +17,14 @@ impl Encoder {
         value.encode(self);
     }
 
+    pub fn code_mut(&mut self) -> &mut [u8] {
+        &mut self.code
+    }
+    
+    pub fn len(&self) -> usize {
+        self.code.len()
+    }
+
     pub fn into_code(self) -> Vec<u8> {
         self.code
     }

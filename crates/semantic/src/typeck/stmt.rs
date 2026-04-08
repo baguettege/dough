@@ -24,7 +24,7 @@ impl TypeChecker<'_> {
 
     fn check_let(&self, node: &untyped::Let) -> Result<Let> {
         // resolver guarantees this is a `Symbol::Local`
-        let Symbol::Local(ty) = self.bindings.get(node)
+        let Symbol::Local { ty, .. } = self.bindings.get(node)
         else { unreachable!() };
 
         let init = self.check_expr(node.init())?;
@@ -35,7 +35,7 @@ impl TypeChecker<'_> {
 
     fn check_assign(&self, node: &untyped::Assign) -> Result<Assign> {
         let ty = match self.bindings.get(node) {
-            Symbol::Global(ty) | Symbol::Local(ty) => *ty,
+            Symbol::Global { ty, .. } | Symbol::Local { ty, .. } => *ty,
             Symbol::Fn { .. } => return Err(Error::NotAssignable(node.target().clone())),
         };
 

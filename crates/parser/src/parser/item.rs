@@ -22,7 +22,7 @@ impl Parser<'_> {
             let ident = this.parse_ident()?;
             expect!(this, Token::Colon);
             let ty = this.parse_type()?;
-            Ok(Param::new(ident, ty))
+            Ok(Param::new(this.next_id(), ident, ty))
         })?;
 
         expect!(self, Token::RParen);
