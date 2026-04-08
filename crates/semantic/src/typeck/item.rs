@@ -1,6 +1,5 @@
 use ast::typed::{Item, Fn, Static, Param, Block, Stmt};
 use ast::{untyped, Node};
-use dough_core::Type;
 use crate::{Error, Result};
 use crate::symbol::Symbol;
 use crate::typeck::{ty, TypeChecker};
@@ -31,7 +30,7 @@ impl TypeChecker<'_> {
         let body = body?;
 
         let ident = node.ident().clone();
-        if return_ty == &Type::Unit || always_returns(&body) {
+        if always_returns(&body) {
             Ok(Fn::new(node.id(), ident, params, *return_ty, body))
         } else {
             Err(Error::MissingReturn(ident))

@@ -16,7 +16,8 @@ node! {
             lhs: Box<Expr>,
             op: BinOp,
             rhs: Box<Expr>,
-            ty: Type,
+            result_ty: Type,
+            operand_ty: Type,
         },
         Unary {
             op: UnOp,

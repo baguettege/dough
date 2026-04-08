@@ -1,5 +1,6 @@
 use crate::Opcode;
 
+#[derive(Debug)]
 pub enum Error {
     UnexpectedEof,
     UnknownOpcode(Opcode),

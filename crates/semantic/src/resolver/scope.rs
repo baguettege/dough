@@ -8,10 +8,6 @@ pub(super) struct Scope {
 }
 
 impl Scope {
-    pub(super) fn new() -> Self {
-        Self::default()
-    }
-
     pub(super) fn enter(&mut self) {
         self.scopes.push(HashMap::new());
     }

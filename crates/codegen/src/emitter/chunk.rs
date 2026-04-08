@@ -4,12 +4,6 @@ use crate::{Error, Result};
 #[derive(Copy, Clone)]
 pub(super) struct Offset(usize);
 
-impl Offset {
-    fn get(self) -> usize {
-        self.0
-    }
-}
-
 pub(super) enum JumpPatch {
     Jmp,
     Jf(Reg),
@@ -97,7 +91,7 @@ impl Builder {
         // rewrites a previously emitted placeholder jump so it lands at `target`
 
         // delta (instr offset) + ip = target
-        let delta = target.get() as isize - site.base.get() as isize;
+        let delta = target.0 as isize - site.base.0 as isize;
         let off: Off = delta
             .try_into()
             .map_err(|_| Error::JumpOutOfRange)?;
@@ -110,9 +104,9 @@ impl Builder {
         encoder.encode(&instr);
         let encoded = encoder.into_code();
 
-        let start = site.start.get();
+        let start = site.start.0;
         let end = start + encoded.len();
-        assert_eq!(site.base.get() - start, encoded.len(), "rebuilt instr len != placeholder instr len");
+        assert_eq!(site.base.0 - start, encoded.len(), "rebuilt instr len != placeholder instr len");
 
         let code = self.encoder.code_mut();
         code[start..end].copy_from_slice(&encoded);

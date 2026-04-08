@@ -13,10 +13,6 @@ pub(crate) enum Slot {
 pub(crate) struct Table(HashMap<NodeId, Slot>);
 
 impl Table {
-    pub(crate) fn new() -> Self {
-        Self::default()
-    }
-
     pub(crate) fn insert(&mut self, node: &impl Node, slot: Slot) {
         self.0.insert(node.id(), slot);
     }

@@ -34,15 +34,15 @@ impl TypeChecker<'_> {
     }
 
     fn check_assign(&self, node: &untyped::Assign) -> Result<Assign> {
-        let ty = match self.bindings.get(node) {
-            Symbol::Global { ty, .. } | Symbol::Local { ty, .. } => *ty,
+        let (ty, binding) = match self.bindings.get(node) {
+            Symbol::Global { ty, id } | Symbol::Local { ty, id } => (*ty, *id),
             Symbol::Fn { .. } => return Err(Error::NotAssignable(node.target().clone())),
         };
 
         let value = self.check_expr(node.value())?;
         ty::expect(ty, ty::of(&value))?;
 
-        Ok(Assign::new(node.id(), node.target().clone(), value))
+        Ok(Assign::new(node.id(), node.target().clone(), value, binding))
     }
 
     fn check_if(&self, node: &untyped::If) -> Result<If> {

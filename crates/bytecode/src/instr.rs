@@ -10,6 +10,7 @@ macro_rules! instr {
             }
         ),+ $(,)?
     ) => {
+        #[derive(Debug)]
         pub enum Instr {
             $(
                 $mnemonic {
@@ -23,7 +24,7 @@ macro_rules! instr {
                 match self {
                     $(
                         Self::$mnemonic { $( $field ),* } => {
-                            encoder.encode(&$opcode);
+                            encoder.encode(&($opcode as $crate::Opcode));
                             $( encoder.encode($field); )*
                         },
                     )*
@@ -45,6 +46,21 @@ macro_rules! instr {
                     )*
                     _ => Err($crate::Error::UnknownOpcode(opcode)),
                 }
+            }
+        }
+
+        impl std::fmt::Display for Instr {
+            fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
+                match self {
+                    $(
+                        Self::$mnemonic { $( $field ),* } => {
+                            write!(f, "{}", stringify!($mnemonic))?;
+                            $( write!(f, " {}:{}", stringify!($field), $field)?; )*
+                        },
+                    )*
+                }
+
+                Ok(())
             }
         }
     };
@@ -80,21 +96,23 @@ instr! {
 
     0x18 => BAnd { dst: Reg, lhs: Reg, rhs: Reg },
     0x19 => BOr { dst: Reg, lhs: Reg, rhs: Reg },
-    0x1A => BNot { dst: Reg, src: Reg },
+    0x1A => BEq { dst: Reg, lhs: Reg, rhs: Reg },
+    0x1B => BNe { dst: Reg, lhs: Reg, rhs: Reg },
+    0x1C => BNot { dst: Reg, src: Reg },
 
-    0x1B => SAdd { dst: Reg, lhs: Reg, rhs: Reg },
-    0x1C => SEq { dst: Reg, lhs: Reg, rhs: Reg },
-    0x1D => SNe { dst: Reg, lhs: Reg, rhs: Reg },
+    0x1D => SAdd { dst: Reg, lhs: Reg, rhs: Reg },
+    0x1E => SEq { dst: Reg, lhs: Reg, rhs: Reg },
+    0x1F => SNe { dst: Reg, lhs: Reg, rhs: Reg },
 
-    0x1E => Mov { dst: Reg, src: Reg },
-    0x1F => Ldc { dst: Reg, idx: Idx },
-    0x20 => Ldu { dst: Reg },
-    0x21 => Ldg { dst: Reg, idx: Idx },
-    0x22 => Stg { idx: Idx, src: Reg },
+    0x20 => Mov { dst: Reg, src: Reg },
+    0x21 => Ldc { dst: Reg, idx: Idx },
+    0x22 => Ldu { dst: Reg },
+    0x23 => Ldg { dst: Reg, idx: Idx },
+    0x24 => Stg { idx: Idx, src: Reg },
 
-    0x23 => Call { dst: Reg, idx: Idx, argc: Argc },
-    0x24 => Ret { src: Reg },
+    0x25 => Call { dst: Reg, idx: Idx, argc: Argc },
+    0x26 => Ret { src: Reg },
 
-    0x25 => Jmp { off: Off },
-    0x26 => Jf { dst: Reg, off: Off },
+    0x27 => Jmp { off: Off },
+    0x28 => Jf { dst: Reg, off: Off },
 }

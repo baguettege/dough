@@ -34,13 +34,13 @@ impl TypeChecker<'_> {
     fn check_binary(&self, node: &untyped::Binary) -> Result<Binary> {
         let (lhs, rhs) = (self.check_expr(node.lhs())?, self.check_expr(node.rhs())?);
 
-        let ty = ty::of(&lhs);
-        ty::expect(ty, ty::of(&rhs))?;
+        let operand_ty = ty::of(&lhs);
+        ty::expect(operand_ty, ty::of(&rhs))?;
 
         let op = *node.op();
-        let ty = match (ty, op) {
+        let result_ty = match (operand_ty, op) {
             (Type::Int | Type::Float,
-                BinOp::Add | BinOp::Sub | BinOp::Mul | BinOp::Div) => ty,
+                BinOp::Add | BinOp::Sub | BinOp::Mul | BinOp::Div) => operand_ty,
 
             (Type::Int | Type::Float,
                 BinOp::Lt | BinOp::Le | BinOp::Gt | BinOp::Ge) => Type::Bool,
@@ -54,10 +54,17 @@ impl TypeChecker<'_> {
             (Type::Str,
                 BinOp::Add) => Type::Str,
 
-            _ => return Err(Error::InvalidBinOp { op, ty }),
+            _ => return Err(Error::InvalidBinOp { op, ty: operand_ty }),
         };
 
-        Ok(Binary::new(node.id(), Box::new(lhs), op, Box::new(rhs), ty))
+        Ok(Binary::new(
+            node.id(),
+            Box::new(lhs),
+            op,
+            Box::new(rhs),
+            result_ty,
+            operand_ty,
+        ))
     }
 
     fn check_unary(&self, node: &untyped::Unary) -> Result<Unary> {
@@ -96,6 +103,12 @@ impl TypeChecker<'_> {
             })
             .collect::<Result<Vec<_>>>()?;
 
-        Ok(Call::new(node.id(), node.callee().clone(), args, *return_ty, *id))
+        Ok(Call::new(
+            node.id(),
+            node.callee().clone(),
+            args,
+            *return_ty,
+            *id,
+        ))
     }
 }

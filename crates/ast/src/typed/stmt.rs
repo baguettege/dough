@@ -1,5 +1,6 @@
 use crate::typed::Expr;
 use dough_core::Type;
+use crate::NodeId;
 
 node! {
     Stmt {
@@ -14,6 +15,7 @@ node! {
         Assign {
             target: String,
             value: Expr,
+            binding: NodeId,
         },
         If {
             condition: Expr,

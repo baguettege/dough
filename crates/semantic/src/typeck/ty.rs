@@ -12,7 +12,7 @@ pub(super) fn of(expr: &Expr) -> Type {
             Literal::Str(_) => Type::Str,
         },
         Expr::Ident(node) => *node.ty(),
-        Expr::Binary(node) => *node.ty(),
+        Expr::Binary(node) => *node.result_ty(),
         Expr::Unary(node) => *node.ty(),
         Expr::Call(node) => *node.ty(),
     }

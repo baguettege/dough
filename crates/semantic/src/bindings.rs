@@ -6,10 +6,6 @@ use crate::symbol::Symbol;
 pub struct Table(HashMap<NodeId, Symbol>);
 
 impl Table {
-    pub(crate) fn new() -> Self {
-        Self::default()
-    }
-
     pub(crate) fn insert(&mut self, node: &impl Node, symbol: Symbol) {
         self.0.insert(node.id(), symbol);
     }

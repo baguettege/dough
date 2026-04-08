@@ -1,25 +1,33 @@
 mod chunk;
+mod stmt;
+mod expr;
+mod program;
+mod common;
 
+use crate::layout::Layout;
+use crate::Result;
 use ast::typed;
-use bytecode::{Encoder, Program};
-use crate::slot;
+use bytecode::{Program, Reg};
+
+// function local register reserved for return values
+pub(crate) const RET_REG: Reg = 0;
 
 struct Emitter<'a> {
-    slots: &'a slot::Table,
-    encoder: Encoder,
+    layout: &'a Layout,
 }
 
 impl<'a> Emitter<'a> {
-    fn new(slots: &'a slot::Table) -> Self {
-        let encoder = Encoder::new();
-        Self { slots, encoder }
+    fn new(layout: &'a Layout) -> Self {
+        Self { layout }
     }
     
-    fn emit(mut self, program: &typed::Program) -> Program {
-        todo!()
+    fn emit(self, program: &typed::Program) -> Result<Program> {
+        let fns = self.emit_fns(program)?;
+        let main = self.emit_entry(program)?;
+        Ok(Program::new(main, fns, self.layout.global_count()))
     }
 }
 
-pub(crate) fn emit(program: &typed::Program, slots: &slot::Table) -> Program {
-    Emitter::new(slots).emit(program)
+pub(crate) fn emit(program: &typed::Program, layout: &Layout) -> Result<Program> {
+    Emitter::new(layout).emit(program)
 }
