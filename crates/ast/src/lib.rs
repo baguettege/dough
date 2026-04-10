@@ -3,9 +3,7 @@ macro_rules! node {
         $node:ident {
             $(
                 $variant:ident {
-                    $(
-                     $field:ident: $ty:ty
-                    ),* $(,)?
+                    $( $field:ident: $ty:ty ),* $(,)?
                 }
             ),* $(,)?
         }

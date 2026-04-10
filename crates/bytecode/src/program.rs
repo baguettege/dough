@@ -1,25 +1,20 @@
 use crate::Chunk;
 
 pub struct Program {
-    main: Chunk,
-    fns: Vec<Chunk>,
-    global_count: usize,
+    entry: Chunk,
+    funcs: Vec<Chunk>,
 }
 
 impl Program {
-    pub fn new(main: Chunk, fns: Vec<Chunk>, global_count: usize) -> Self {
-        Self { main, fns, global_count }
+    pub fn new(entry: Chunk, funcs: Vec<Chunk>) -> Self {
+        Self { entry, funcs }
     }
 
-    pub fn main(&self) -> &Chunk {
-        &self.main
+    pub fn entry(&self) -> &Chunk {
+        &self.entry
     }
 
-    pub fn fns(&self) -> &[Chunk] {
-        &self.fns
-    }
-    
-    pub fn global_count(&self) -> usize {
-        self.global_count
+    pub fn funcs(&self) -> &[Chunk] {
+        &self.funcs
     }
 }

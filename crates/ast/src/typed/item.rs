@@ -1,19 +1,14 @@
-use crate::typed::{Block, Expr};
-use dough_core::Type;
+use crate::typed::Block;
 use crate::{Node, NodeId};
+use dough_core::Type;
 
 node! {
     Item {
-        Fn {
+        Func {
             ident: String,
             params: Vec<Param>,
             return_ty: Type,
             body: Block,
-        },
-        Static {
-            ident: String,
-            ty: Type,
-            init: Expr,
         },
     }
 }

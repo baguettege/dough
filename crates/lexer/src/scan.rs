@@ -5,9 +5,8 @@ use crate::Token;
 
 pub(crate) fn from_keyword(keyword: &str) -> Option<Token> {
     match keyword {
-        "fn" => Some(Token::Fn),
+        "func" => Some(Token::Func),
         "let" => Some(Token::Let),
-        "static" => Some(Token::Static),
         "if" => Some(Token::If),
         "else" => Some(Token::Else),
         "while" => Some(Token::While),

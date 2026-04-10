@@ -8,6 +8,10 @@ impl<'a> Decoder<'a> {
     pub fn new(code: &'a [u8]) -> Self {
         Self { code }
     }
+    
+    pub fn is_empty(&self) -> bool {
+        self.code.is_empty()
+    }
 
     pub fn read<const N: usize>(&mut self) -> Result<[u8; N]> {
         match self.code.split_at_checked(N) {

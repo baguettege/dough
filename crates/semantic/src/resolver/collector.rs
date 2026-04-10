@@ -2,7 +2,7 @@ use ast::Node;
 use crate::resolver::{ty, Resolver};
 use crate::symbol::Symbol;
 use crate::Result;
-use ast::untyped::{Fn, Item, Program};
+use ast::untyped::{Func, Item, Program};
 use dough_core::Type;
 
 struct Collector<'a> {
@@ -20,12 +20,11 @@ impl<'a> Collector<'a> {
 
     fn collect_item(&mut self, item: &Item) -> Result<()> {
         match item {
-            Item::Fn(node) => self.collect_fn(node),
-            Item::Static(_) => Ok(()), // skip - handled in resolve pass
+            Item::Func(node) => self.collect_func(node),
         }
     }
 
-    fn collect_fn(&mut self, node: &Fn) -> Result<()> {
+    fn collect_func(&mut self, node: &Func) -> Result<()> {
         let params = node.params()
             .iter()
             .map(|p| ty::resolve(p.ty()))
@@ -37,7 +36,7 @@ impl<'a> Collector<'a> {
             .unwrap_or(Type::Unit);
         let id = node.id();
 
-        let symbol = Symbol::Fn { params, return_ty, id };
+        let symbol = Symbol::Func { params, return_ty, id };
         self.resolver.define(node, node.ident(), symbol)?;
 
         Ok(())

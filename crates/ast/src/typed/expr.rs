@@ -6,6 +6,7 @@ node! {
     Expr {
         LiteralExpr {
             literal: Literal,
+            ty: Type,
         },
         Ident {
             ident: String,
@@ -16,8 +17,7 @@ node! {
             lhs: Box<Expr>,
             op: BinOp,
             rhs: Box<Expr>,
-            result_ty: Type,
-            operand_ty: Type,
+            ty: Type,
         },
         Unary {
             op: UnOp,
@@ -30,5 +30,17 @@ node! {
             ty: Type,
             binding: NodeId,
         },
+    }
+}
+
+impl Expr {
+    pub fn ty(&self) -> Type {
+        match self {
+            Expr::LiteralExpr(node) => node.ty,
+            Expr::Ident(node) => node.ty,
+            Expr::Binary(node) => node.ty,
+            Expr::Unary(node) => node.ty,
+            Expr::Call(node) => node.ty,
+        }
     }
 }

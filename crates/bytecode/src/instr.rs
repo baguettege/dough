@@ -1,49 +1,61 @@
-use crate::{Decoder, Idx, Reg, Argc, Off};
+use crate::{Idx, Argc, Off};
 
 macro_rules! instr {
     (
         $(
-            $opcode:literal => $mnemonic:ident {
-                $(
-                    $field:ident: $ty:ty
-                ),* $(,)?
-            }
+            $opcode:literal => $mnemonic:ident
+            $(
+                (
+                    $( $field:ident: $ty:ty ),* $(,)?
+                )
+            )?
         ),+ $(,)?
     ) => {
         #[derive(Debug)]
         pub enum Instr {
             $(
-                $mnemonic {
-                    $( $field: $ty ),*
+                $mnemonic
+                $(( $($ty),* ))?
+            ),+
+        }
+
+        impl Instr {
+            #[allow(unused_variables)]
+            pub fn size(&self) -> usize {
+                size_of::<$crate::Opcode>() + match self {
+                    $(
+                        Self::$mnemonic $(( $($field),* ))? => {
+                            0 $($( +  size_of::<$ty>() )*)?
+                        }
+                    ),+
                 }
-            ),*
+            }
         }
 
         impl $crate::Encode for Instr {
             fn encode(&self, encoder: &mut $crate::Encoder) {
                 match self {
                     $(
-                        Self::$mnemonic { $( $field ),* } => {
+                        Self::$mnemonic $(( $($field),* ))? => {
                             encoder.encode(&($opcode as $crate::Opcode));
-                            $( encoder.encode($field); )*
-                        },
-                    )*
+                            $( $( encoder.encode($field); )* )?
+                        }
+                    ),+
                 }
             }
         }
 
         impl $crate::Decode for Instr {
-            fn decode(decoder: &mut Decoder) -> crate::Result<Self> {
+            fn decode(decoder: &mut $crate::Decoder) -> $crate::Result<Self> {
                 let opcode = decoder.decode::<$crate::Opcode>()?;
 
                 match opcode {
                     $(
-                        $opcode => Ok(Self::$mnemonic {
-                            $(
-                                $field: decoder.decode::<$ty>()?
-                            ),*
-                        }),
-                    )*
+                        $opcode => Ok(
+                            Self::$mnemonic
+                            $(( $( decoder.decode::<$ty>()? ),* ))?
+                        ),
+                    )+
                     _ => Err($crate::Error::UnknownOpcode(opcode)),
                 }
             }
@@ -53,13 +65,12 @@ macro_rules! instr {
             fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
                 match self {
                     $(
-                        Self::$mnemonic { $( $field ),* } => {
+                        Self::$mnemonic $(( $($field),* ))? => {
                             write!(f, "{}", stringify!($mnemonic))?;
-                            $( write!(f, " {}:{}", stringify!($field), $field)?; )*
-                        },
-                    )*
+                            $($( write!(f, " {}={}", stringify!($field), $field)?; )*)?
+                        }
+                    ),+
                 }
-
                 Ok(())
             }
         }
@@ -67,52 +78,52 @@ macro_rules! instr {
 }
 
 instr! {
-    0x00 => Nop {},
-    0x01 => Halt {},
+    0x00 => Nop,
+    0x01 => Halt,
 
-    0x02 => IAdd { dst: Reg, lhs: Reg, rhs: Reg },
-    0x03 => ISub { dst: Reg, lhs: Reg, rhs: Reg },
-    0x04 => IMul { dst: Reg, lhs: Reg, rhs: Reg },
-    0x05 => IDiv { dst: Reg, lhs: Reg, rhs: Reg },
-    0x06 => INeg { dst: Reg, src: Reg },
-    0x07 => IEq { dst: Reg, lhs: Reg, rhs: Reg },
-    0x08 => INe { dst: Reg, lhs: Reg, rhs: Reg },
-    0x09 => ILt { dst: Reg, lhs: Reg, rhs: Reg },
-    0x0A => ILe { dst: Reg, lhs: Reg, rhs: Reg },
-    0x0B => IGt { dst: Reg, lhs: Reg, rhs: Reg },
-    0x0C => IGe { dst: Reg, lhs: Reg, rhs: Reg },
+    0x02 => IAdd,
+    0x03 => ISub,
+    0x04 => IMul,
+    0x05 => IDiv,
+    0x06 => INeg,
+    0x07 => IEq,
+    0x08 => INe,
+    0x09 => ILt,
+    0x0A => ILe,
+    0x0B => IGt,
+    0x0C => IGe,
 
-    0x0D => FAdd { dst: Reg, lhs: Reg, rhs: Reg },
-    0x0E => FSub { dst: Reg, lhs: Reg, rhs: Reg },
-    0x0F => FMul { dst: Reg, lhs: Reg, rhs: Reg },
-    0x10 => FDiv { dst: Reg, lhs: Reg, rhs: Reg },
-    0x11 => FNeg { dst: Reg, src: Reg },
-    0x12 => FEq { dst: Reg, lhs: Reg, rhs: Reg },
-    0x13 => FNe { dst: Reg, lhs: Reg, rhs: Reg },
-    0x14 => FLt { dst: Reg, lhs: Reg, rhs: Reg },
-    0x15 => FLe { dst: Reg, lhs: Reg, rhs: Reg },
-    0x16 => FGt { dst: Reg, lhs: Reg, rhs: Reg },
-    0x17 => FGe { dst: Reg, lhs: Reg, rhs: Reg },
+    0x0D => FAdd,
+    0x0E => FSub,
+    0x0F => FMul,
+    0x10 => FDiv,
+    0x11 => FNeg,
+    0x12 => FEq,
+    0x13 => FNe,
+    0x14 => FLt,
+    0x15 => FLe,
+    0x16 => FGt,
+    0x17 => FGe,
 
-    0x18 => BAnd { dst: Reg, lhs: Reg, rhs: Reg },
-    0x19 => BOr { dst: Reg, lhs: Reg, rhs: Reg },
-    0x1A => BEq { dst: Reg, lhs: Reg, rhs: Reg },
-    0x1B => BNe { dst: Reg, lhs: Reg, rhs: Reg },
-    0x1C => BNot { dst: Reg, src: Reg },
+    0x18 => BAnd,
+    0x19 => BOr,
+    0x1A => BNot,
+    0x1B => BEq,
+    0x1C => BNe,
 
-    0x1D => SAdd { dst: Reg, lhs: Reg, rhs: Reg },
-    0x1E => SEq { dst: Reg, lhs: Reg, rhs: Reg },
-    0x1F => SNe { dst: Reg, lhs: Reg, rhs: Reg },
+    0x1D => SAdd,
+    0x1E => SEq,
+    0x1F => SNe,
 
-    0x20 => Mov { dst: Reg, src: Reg },
-    0x21 => Ldc { dst: Reg, idx: Idx },
-    0x22 => Ldu { dst: Reg },
-    0x23 => Ldg { dst: Reg, idx: Idx },
-    0x24 => Stg { idx: Idx, src: Reg },
+    0x20 => Jmp(off: Off),
+    0x21 => Jf(off: Off),
 
-    0x25 => Call { dst: Reg, idx: Idx, argc: Argc },
-    0x26 => Ret { src: Reg },
+    0x22 => Call(idx: Idx, argc: Argc),
+    0x23 => Ret,
 
-    0x27 => Jmp { off: Off },
-    0x28 => Jf { dst: Reg, off: Off },
+    0x24 => Push(idx: Idx),
+    0x25 => PushU,
+    0x26 => Pop,
+    0x27 => Ldl(idx: Idx),
+    0x28 => Stl(idx: Idx),
 }

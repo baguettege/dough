@@ -1,20 +1,14 @@
 use crate::{Node, NodeId};
 use crate::types::TypeRef;
 use crate::untyped::stmt::Block;
-use crate::untyped::Expr;
 
 node! {
     Item {
-        Fn {
+        Func {
             ident: String,
             params: Vec<Param>,
             return_ty: Option<TypeRef>,
             body: Block,
-        },
-        Static {
-            ident: String,
-            ty: TypeRef,
-            init: Expr,
         },
     }
 }

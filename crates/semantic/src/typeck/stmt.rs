@@ -1,9 +1,9 @@
 use crate::typeck::{ty, TypeChecker};
 use crate::{Error, Result};
-use ast::typed::{Assign, ExprStmt, If, Let, Return, Stmt, While};
+use crate::symbol::Symbol;
+use ast::typed::{Assign, Expr, ExprStmt, If, Let, Return, Stmt, While};
 use ast::{untyped, Node};
 use dough_core::Type;
-use crate::symbol::Symbol;
 
 impl TypeChecker<'_> {
     pub(super) fn check_stmt(&self, stmt: &untyped::Stmt) -> Result<Stmt> {
@@ -28,26 +28,26 @@ impl TypeChecker<'_> {
         else { unreachable!() };
 
         let init = self.check_expr(node.init())?;
-        ty::expect(*ty, ty::of(&init))?;
+        ty::expect(*ty, init.ty())?;
 
         Ok(Let::new(node.id(), node.ident().clone(), *ty, init))
     }
 
     fn check_assign(&self, node: &untyped::Assign) -> Result<Assign> {
         let (ty, binding) = match self.bindings.get(node) {
-            Symbol::Global { ty, id } | Symbol::Local { ty, id } => (*ty, *id),
-            Symbol::Fn { .. } => return Err(Error::NotAssignable(node.target().clone())),
+            Symbol::Local { ty, id } => (*ty, *id),
+            Symbol::Func { .. } => return Err(Error::NotAssignable(node.target().clone())),
         };
 
         let value = self.check_expr(node.value())?;
-        ty::expect(ty, ty::of(&value))?;
+        ty::expect(ty, value.ty())?;
 
         Ok(Assign::new(node.id(), node.target().clone(), value, binding))
     }
 
     fn check_if(&self, node: &untyped::If) -> Result<If> {
         let condition = self.check_expr(node.condition())?;
-        ty::expect(Type::Bool, ty::of(&condition))?;
+        ty::expect(Type::Bool, condition.ty())?;
 
         let then_body = self.check_block(node.then_body())?;
         let else_body = node
@@ -61,10 +61,9 @@ impl TypeChecker<'_> {
 
     fn check_while(&self, node: &untyped::While) -> Result<While> {
         let condition = self.check_expr(node.condition())?;
-        ty::expect(Type::Bool, ty::of(&condition))?;
+        ty::expect(Type::Bool, condition.ty())?;
 
         let body = self.check_block(node.body())?;
-
         Ok(While::new(node.id(), condition, body))
     }
 
@@ -76,7 +75,7 @@ impl TypeChecker<'_> {
             .transpose()?;
         let ty = value
             .as_ref()
-            .map(ty::of)
+            .map(Expr::ty)
             .unwrap_or(Type::Unit);
 
         // `return_ty` should never be `None` as it is set to `Some` before

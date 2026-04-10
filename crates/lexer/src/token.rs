@@ -7,9 +7,8 @@ pub enum Token {
 
     Ident(String),
 
-    Fn,
+    Func,
     Let,
-    Static,
     If,
     Else,
     While,

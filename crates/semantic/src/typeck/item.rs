@@ -1,20 +1,19 @@
-use ast::typed::{Item, Fn, Static, Param, Block, Stmt};
-use ast::{untyped, Node};
-use crate::{Error, Result};
 use crate::symbol::Symbol;
-use crate::typeck::{ty, TypeChecker};
+use crate::typeck::TypeChecker;
+use crate::{Error, Result};
+use ast::typed::{Block, Func, Item, Param, Stmt};
+use ast::{untyped, Node};
 
 impl TypeChecker<'_> {
     pub(super) fn check_item(&mut self, item: &untyped::Item) -> Result<Item> {
         match item {
-            untyped::Item::Fn(node) => self.check_fn(node).map(Into::into),
-            untyped::Item::Static(node) => self.check_static(node).map(Into::into),
+            untyped::Item::Func(node) => self.check_func(node).map(Into::into),
         }
     }
 
-    fn check_fn(&mut self, node: &untyped::Fn) -> Result<Fn> {
-        // resolver guarantees this is a `Symbol::Fn`
-        let Symbol::Fn { params, return_ty, .. } = self.bindings.get(node)
+    fn check_func(&mut self, node: &untyped::Func) -> Result<Func> {
+        // resolver guarantees this is a `Symbol::Func`
+        let Symbol::Func { params, return_ty, .. } = self.bindings.get(node)
         else { unreachable!() };
 
         let params = params
@@ -31,20 +30,10 @@ impl TypeChecker<'_> {
 
         let ident = node.ident().clone();
         if always_returns(&body) {
-            Ok(Fn::new(node.id(), ident, params, *return_ty, body))
+            Ok(Func::new(node.id(), ident, params, *return_ty, body))
         } else {
             Err(Error::MissingReturn(ident))
         }
-    }
-
-    fn check_static(&self, node: &untyped::Static) -> Result<Static> {
-        let Symbol::Global { ty, .. } = self.bindings.get(node)
-        else { unreachable!() };
-
-        let init = self.check_expr(node.init())?;
-        ty::expect(*ty, ty::of(&init))?;
-
-        Ok(Static::new(node.id(), node.ident().clone(), *ty, init))
     }
 }
 

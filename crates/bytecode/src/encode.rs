@@ -17,8 +17,9 @@ impl Encoder {
         value.encode(self);
     }
 
-    pub fn code_mut(&mut self) -> &mut [u8] {
-        &mut self.code
+    pub fn patch(&mut self, offset: usize, bytes: &[u8]) {
+        let end = offset + bytes.len();
+        self.code[offset..end].copy_from_slice(bytes);
     }
     
     pub fn len(&self) -> usize {

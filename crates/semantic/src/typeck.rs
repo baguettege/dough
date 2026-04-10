@@ -37,7 +37,7 @@ fn has_main(program: &Program) -> bool {
     program
         .iter()
         .any(|item| match item {
-            Item::Fn(node) => {
+            Item::Func(node) => {
                 node.ident() == "main" &&
                     node.params().is_empty() &&
                     node.return_ty() == &Type::Unit
