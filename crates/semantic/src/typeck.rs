@@ -42,7 +42,6 @@ fn has_main(program: &Program) -> bool {
                     node.params().is_empty() &&
                     node.return_ty() == &Type::Unit
             },
-            _ => false,
         })
 }
 

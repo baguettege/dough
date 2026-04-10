@@ -1,10 +1,14 @@
 use ast::typed;
 use bytecode::Program;
 
-mod compiler;
-mod func_compiler;
-mod func_table;
+mod func;
+mod chunk;
+mod collector;
+mod entry;
 
 pub fn compile(program: &typed::Program) -> Program {
-    compiler::compile(program)
+    let table = collector::collect(program);
+    let entry = entry::compile(program, &table);
+    let funcs = func::compile(program, &table);
+    Program::new(entry, funcs)
 }

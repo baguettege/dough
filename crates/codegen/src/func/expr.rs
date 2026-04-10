@@ -2,7 +2,7 @@ use ast::typed::{Binary, Call, Expr, Ident, LiteralExpr, Unary};
 use ast::types::{BinOp, Literal, UnOp};
 use bytecode::{Argc, Constant, Instr};
 use dough_core::Type;
-use crate::func_compiler::FuncCompiler;
+use crate::func::FuncCompiler;
 
 impl FuncCompiler<'_> {
     pub(super) fn compile_expr(&mut self, expr: &Expr) {

@@ -1,7 +1,8 @@
-use ast::typed::Func;
-use bytecode::{Chunk, ChunkBuilder};
+use ast::typed::{Func, Item, Program};
+use bytecode::Chunk;
 use alloc::LocalAllocator;
-use crate::func_table::FuncTable;
+use crate::collector::FuncTable;
+use crate::chunk::Builder;
 
 mod expr;
 mod stmt;
@@ -9,14 +10,14 @@ mod common;
 mod alloc;
 
 struct FuncCompiler<'a> {
-    chunk: ChunkBuilder,
+    chunk: Builder,
     locals: LocalAllocator,
     funcs: &'a FuncTable,
 }
 
 impl<'a> FuncCompiler<'a> {
     fn new(funcs: &'a FuncTable) -> Self {
-        let chunk = ChunkBuilder::new();
+        let chunk = Builder::new();
         let locals = LocalAllocator::new();
         Self { chunk, locals, funcs }
     }
@@ -31,6 +32,14 @@ impl<'a> FuncCompiler<'a> {
     }
 }
 
-pub(crate) fn compile(funcs: &FuncTable, node: &Func) -> Chunk {
-    FuncCompiler::new(funcs).compile(node)
+pub(crate) fn compile(program: &Program, funcs: &FuncTable) -> Vec<Chunk> {
+    program
+        .iter()
+        .filter_map(|item| match item {
+            Item::Func(node) =>
+                Some(FuncCompiler::new(funcs).compile(node)),
+        })
+        .collect()
 }
+
+

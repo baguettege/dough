@@ -1,6 +1,7 @@
 use ast::typed::{Assign, ExprStmt, If, Let, Return, Stmt, While};
-use bytecode::{Instr, JumpKind};
-use crate::func_compiler::FuncCompiler;
+use bytecode::Instr;
+use crate::chunk::JumpKind;
+use crate::func::FuncCompiler;
 
 impl FuncCompiler<'_> {
     pub(super) fn compile_stmt(&mut self, stmt: &Stmt) {
