@@ -16,3 +16,11 @@ impl<T: Object> Handle<T> {
         self.0
     }
 }
+
+impl<T: Object> Copy for Handle<T> {}
+
+impl<T: Object> Clone for Handle<T> {
+    fn clone(&self) -> Self {
+        *self
+    }
+}

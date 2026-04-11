@@ -23,11 +23,12 @@ impl Display for Constant {
 pub struct Chunk {
     code: Vec<Instr>,
     constants: Vec<Constant>,
+    local_count: usize,
 }
 
 impl Chunk {
-    pub fn new(code: Vec<Instr>, constants: Vec<Constant>) -> Self {
-        Self { code, constants }
+    pub fn new(code: Vec<Instr>, constants: Vec<Constant>, local_count: usize) -> Self {
+        Self { code, constants, local_count }
     }
 
     pub fn code(&self) -> &[Instr] {
@@ -36,6 +37,10 @@ impl Chunk {
 
     pub fn constants(&self) -> &[Constant] {
         &self.constants
+    }
+    
+    pub fn local_count(&self) -> usize {
+        self.local_count
     }
 }
 

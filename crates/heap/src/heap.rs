@@ -23,17 +23,17 @@ impl Heap {
         unsafe { Handle::new(ptr) }
     }
 
-    pub fn with<T, F>(&mut self, handle: &Handle<T>, f: F)
+    pub fn with<T, R, F>(&mut self, handle: &Handle<T>, f: F) -> R
     where
         T: Object,
-        F: FnOnce(&mut T),
+        F: FnOnce(&mut T) -> R,
     {
         let mut ptr = handle.ptr();
         assert!(self.roots.contains(&ptr.cast()), "stale handle");
 
         // SAFETY: `handle.ptr()` is a valid ptr to a valid `GcBox<T>` managed by the heap
         let object = unsafe { ptr.as_mut().object_mut() };
-        f(object);
+        f(object)
     }
 
     pub fn gc(&mut self) {

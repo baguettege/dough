@@ -28,7 +28,8 @@ impl<'a> FuncCompiler<'a> {
         }
 
         self.compile_block(node.body());
-        self.chunk.build()
+        let local_count = self.locals.count();
+        self.chunk.build(local_count)
     }
 }
 

@@ -89,7 +89,7 @@ impl Builder {
         idx
     }
 
-    pub fn build(self) -> Chunk {
-        Chunk::new(self.code, self.constants)
+    pub fn build(self, local_count: usize) -> Chunk {
+        Chunk::new(self.code, self.constants, local_count)
     }
 }

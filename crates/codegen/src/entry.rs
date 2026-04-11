@@ -11,7 +11,7 @@ pub(crate) fn compile(program: &Program, funcs: &FuncTable) -> Chunk {
     let mut builder = Builder::new();
     builder.emit(Instr::Call(idx, 0));
     builder.emit(Instr::Halt);
-    builder.build()
+    builder.build(0)
 }
 
 fn main_func(program: &Program) -> &Func {

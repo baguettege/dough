@@ -11,25 +11,12 @@ macro_rules! instr {
             )?
         ),+ $(,)?
     ) => {
-        #[derive(Debug)]
+        #[derive(Debug, Copy, Clone)]
         pub enum Instr {
             $(
                 $mnemonic
                 $(( $($ty),* ))?
             ),+
-        }
-
-        impl Instr {
-            #[allow(unused_variables)]
-            pub fn size(&self) -> usize {
-                size_of::<$crate::Opcode>() + match self {
-                    $(
-                        Self::$mnemonic $(( $($field),* ))? => {
-                            0 $($( +  size_of::<$ty>() )*)?
-                        }
-                    ),+
-                }
-            }
         }
 
         impl $crate::Encode for Instr {

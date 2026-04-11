@@ -81,18 +81,6 @@ impl<T: Object> GcBox<T> {
         Self { header, object }
     }
 
-    pub(crate) fn header(&self) -> &Header {
-        &self.header
-    }
-
-    pub(crate) fn header_mut(&mut self) -> &mut Header {
-        &mut self.header
-    }
-
-    pub(crate) fn object(&self) -> &T {
-        &self.object
-    }
-
     pub(crate) fn object_mut(&mut self) -> &mut T {
         &mut self.object
     }
