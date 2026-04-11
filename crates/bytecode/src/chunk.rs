@@ -15,7 +15,7 @@ impl Display for Constant {
             Constant::Int(v) => write!(f, "{}", v),
             Constant::Float(v) => write!(f, "{}", v),
             Constant::Bool(v) => write!(f, "{}", v),
-            Constant::Str(v) => write!(f, "{}", v),
+            Constant::Str(v) => write!(f, "\"{}\"", v),
         }
     }
 }
