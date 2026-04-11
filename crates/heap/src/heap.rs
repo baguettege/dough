@@ -3,6 +3,8 @@ use crate::handle::Handle;
 use crate::{gc, Object};
 use crate::gc::{GcBox, Root};
 
+const GC_THRESHOLD: usize = 1024;
+
 #[derive(Default)]
 pub struct Heap {
     roots: Vec<Root>,
@@ -19,6 +21,8 @@ impl Heap {
         let ptr = NonNull::new(ptr).unwrap();
 
         self.roots.push(ptr.cast());
+        if self.roots.len() > GC_THRESHOLD { gc::run(self); }
+
         // SAFETY: `ptr` points to a freshly allocated `GcBox<T>`
         unsafe { Handle::new(ptr) }
     }
@@ -36,10 +40,6 @@ impl Heap {
         // SAFETY: `handle.ptr()` is a valid ptr to a valid `GcBox<T>` managed by the heap
         let object = unsafe { ptr.as_mut().object_mut() };
         f(object)
-    }
-
-    pub fn gc(&mut self) {
-        gc::run(self);
     }
 }
 
