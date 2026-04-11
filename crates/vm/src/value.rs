@@ -1,5 +1,6 @@
 mod str;
 
+use std::fmt;
 pub(crate) use str::Str;
 
 use dough_core::Type;
@@ -12,6 +13,30 @@ pub(crate) enum Value {
     Bool(bool),
     Unit,
     Str(Handle<Str>),
+}
+
+impl Value {
+    fn ty(&self) -> Type {
+        match self {
+            Value::Int(_) => Type::Int,
+            Value::Float(_) => Type::Float,
+            Value::Bool(_) => Type::Bool,
+            Value::Unit => Type::Unit,
+            Value::Str(_) => Type::Str,
+        }
+    }
+}
+
+impl fmt::Display for Value {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        match self {
+            Value::Int(v) => write!(f, "{v}"),
+            Value::Float(v) => write!(f, "{v}"),
+            Value::Bool(v) => write!(f, "{v}"),
+            Value::Unit => write!(f, "unit"),
+            Value::Str(v) => write!(f, "Str({v})"),
+        }
+    }
 }
 
 macro_rules! impl_try_from_value {
@@ -30,18 +55,6 @@ macro_rules! impl_try_from_value {
             }
         }
     };
-}
-
-impl Value {
-    fn ty(&self) -> Type {
-        match self {
-            Value::Int(_) => Type::Int,
-            Value::Float(_) => Type::Float,
-            Value::Bool(_) => Type::Bool,
-            Value::Unit => Type::Unit,
-            Value::Str(_) => Type::Str,
-        }
-    }
 }
 
 impl_try_from_value!(Int(i64));

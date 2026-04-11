@@ -7,3 +7,6 @@ edition = "2024"
 bytecode = { path = "../bytecode" }
 dough_core = { path = "../dough_core" }
 heap = { path = "../heap" }
+
+[features]
+trace = []

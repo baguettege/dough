@@ -23,11 +23,13 @@ impl Heap {
         unsafe { Handle::new(ptr) }
     }
 
-    pub fn with<T, R, F>(&mut self, handle: &Handle<T>, f: F) -> R
+    pub fn with<T, R, F>(&mut self, handle: Handle<T>, f: F) -> R
     where
         T: Object,
         F: FnOnce(&mut T) -> R,
     {
+        // `&mut self` for exclusive access
+
         let mut ptr = handle.ptr();
         assert!(self.roots.contains(&ptr.cast()), "stale handle");
 

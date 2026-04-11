@@ -43,4 +43,8 @@ impl Stack {
     pub(super) fn truncate(&mut self, base: usize) {
         self.0.truncate(base);
     }
+    
+    pub(super) fn iter(&self) -> impl Iterator<Item = &Value> {
+        self.0.iter()
+    }
 }

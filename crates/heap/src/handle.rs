@@ -1,3 +1,4 @@
+use std::fmt;
 use std::ptr::NonNull;
 use crate::gc::GcBox;
 use crate::Object;
@@ -22,5 +23,11 @@ impl<T: Object> Copy for Handle<T> {}
 impl<T: Object> Clone for Handle<T> {
     fn clone(&self) -> Self {
         *self
+    }
+}
+
+impl<T: Object> fmt::Display for Handle<T> {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        write!(f, "{:p}", self.0.as_ptr())
     }
 }

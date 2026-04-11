@@ -83,9 +83,9 @@ impl Vm<'_> {
         let lhs: Handle<Str> = pop!(self);
 
         let rhs = self.heap.with(
-            &rhs, |obj| obj.as_str().to_string());
+            rhs, |obj| obj.as_str().to_string());
         let result = self.heap.with(
-            &lhs, |obj| format!("{}{}", obj.as_str(), rhs));
+            lhs, |obj| format!("{}{}", obj.as_str(), rhs));
 
         let handle = self.heap.alloc(Str::new(result));
         push!(self, Value::Str(handle));

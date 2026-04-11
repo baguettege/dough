@@ -41,9 +41,9 @@ macro_rules! str_cmp_op {
             let lhs: heap::Handle<$crate::value::Str> = pop!($self);
 
             let rhs = $self.heap.with(
-                &rhs, |obj| obj.as_str().to_string());
+                rhs, |obj| obj.as_str().to_string());
             let result = $self.heap.with(
-                &lhs, |obj| obj.as_str() == rhs);
+                lhs, |obj| obj.as_str() == rhs);
 
             push!($self, $crate::value::Value::Bool(result));
             Ok(())

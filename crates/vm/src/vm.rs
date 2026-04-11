@@ -23,12 +23,8 @@ mod cmp;
 mod logic;
 mod flow;
 mod mem;
-mod exec;
-
-enum ControlFlow {
-    Continue,
-    Halt,
-}
+mod dispatch;
+mod trace;
 
 struct Vm<'a> {
     program: &'a Program,

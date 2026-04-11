@@ -1,3 +1,4 @@
+use std::fmt;
 use heap::{Trace, Tracer};
 
 pub(crate) struct Str(String);
@@ -17,3 +18,9 @@ impl Trace for Str {
 }
 
 impl heap::Object for Str {}
+
+impl fmt::Display for Str {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        write!(f, "{}", self.0)
+    }
+}
