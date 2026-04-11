@@ -31,6 +31,7 @@ impl Heap {
         let mut ptr = handle.ptr();
         assert!(self.roots.contains(&ptr.cast()), "stale handle");
 
+        // SAFETY: `handle.ptr()` is a valid ptr to a valid `GcBox<T>` managed by the heap
         let object = unsafe { ptr.as_mut().object_mut() };
         f(object);
     }
@@ -44,7 +45,7 @@ impl Heap {
     pub(crate) fn roots(&self) -> &[Root] {
         &self.roots
     }
-    
+
     pub(crate) fn roots_mut(&mut self) -> &mut Vec<Root> {
         &mut self.roots
     }
